@@ -2,11 +2,11 @@
 
 class WP_Rulette
 {
-    function active()
+    public static function active()
     {
     }
 
-    function deactive()
+    public static function deactive()
     {
     }
 }
