@@ -12,10 +12,5 @@ class WP_Rulette
 
     public static function render_rulette()
     {
-
-?>
-
-
-<?php
     }
 }
