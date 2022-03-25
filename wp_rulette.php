@@ -18,3 +18,9 @@ require 'class_wp_rulette.php';
 register_activation_hook(__FILE__, array('WP_Rulette', 'active'));
 register_deactivation_hook(__FILE__, array('WP_Rulette', 'deactive'));
 // register_uninstall_hook(__FILE__, array('WP_Rulette', 'uninstall') );
+// add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
+
+function shortcodes_init(){
+    add_shortcode( 'rulette', array('WP_Rulette', 'render_rulette') );
+}
+add_action('init', 'shortcodes_init');
