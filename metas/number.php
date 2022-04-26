@@ -1,0 +1,1 @@
+<input type="number" class="wp_rulette_number" id="wp_rulette_number" name="wp_rulette_number"/>

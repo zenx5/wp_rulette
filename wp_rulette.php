@@ -23,4 +23,4 @@ register_deactivation_hook(__FILE__, array('WP_Rulette', 'deactive'));
 function shortcodes_init(){
     add_shortcode( 'rulette', array('WP_Rulette', 'render_rulette') );
 }
-add_action('init', 'shortcodes_init');
+add_action('init', array('WP_Rulette','init'));
