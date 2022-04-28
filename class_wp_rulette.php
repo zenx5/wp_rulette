@@ -23,7 +23,33 @@ class WP_Rulette extends PluginK
         add_action('save_post', array('WP_Rulette', 'save_post'));
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
+        add_action('wp_head', array('WP_Rulette', 'get_sectores'));
+        add_shortcode( 'rulette', array('WP_Rulette', 'render_rulette') );
         // self::save_post( );
+    }
+
+    public static function get_sectores( ) {
+        $datas = array( );
+        $query = new WP_Query( array(
+            'post_type' => 'rulette_sector',
+            'posts_per_page' => -1
+        ));
+        foreach ( $query->posts as $post ) {
+            $metas = get_post_meta($post->ID);
+            $data = array(
+                'name' => $post->post_title,
+                'number' => $metas['wp_rulette_number'][0],
+                'color' => $metas['wp_rulette_color'][0],
+                'order' => $metas['wp_rulette_order'][0]
+            );
+            $datas[] = $data;
+        };
+    ?>
+        <script type="text/javascript">
+            var Rulette_sectors = <?= json_encode( $datas ); ?>;
+            console.log(Rulette_sectors)
+        </script>
+    <?php
     }
 
     public static function render_rulette()
@@ -60,6 +86,7 @@ class WP_Rulette extends PluginK
         update_post_meta($post_id, "wp_rulette_number", $_POST['wp_rulette_number']);
         update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
         update_post_meta($post_id, "wp_rulette_image", $_POST['wp_rulette_image']);
+        update_post_meta($post_id, "wp_rulette_order", $_POST['wp_rulette_order']);
         //die();
     }
 
@@ -99,9 +126,15 @@ class WP_Rulette extends PluginK
                 }
             ],
             [
-                'title' => 'img',
+                'title' => 'image',
                 'render_callback' => function () {
                     include 'metas/image.php';
+                }
+            ],
+            [
+                'title' => 'order',
+                'render_callback' => function () {
+                    include 'metas/order.php';
                 }
             ]
 

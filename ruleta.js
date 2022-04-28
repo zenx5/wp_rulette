@@ -3,15 +3,29 @@ class Ruleta {
         callback_winner,
         canvasId
     } = {}) {
+        console.log(Rulette_sectors)
+        let rulette_segments = Rulette_sectors
+        // .sort( (elemA, elemB) => {
+        //     return elemA.order - elemB.order
+        // })
+        .map( element => {
+            return {
+                'fillStyle': element.color,
+                'text': element.number
+            }
+        });
+        console.log(Rulette_sectors)
         this.wheelSpinning = false;
         this.callback_winner = callback_winner;
         this.innerWheel = new Winwheel({
             'canvasId': canvasId || 'canvas',
-            'numSegments' : 38,
+            'numSegments' : rulette_segments.length,
             'outerRadius' : 160,        // Set the outer radius to make the wheel smaller than the outer wheel.
             'textFillStyle': 'white',
             'textAlignment': 'outer',
-            'segments': [
+            // 'textOrientation': 'curved', 
+            'segments': rulette_segments
+            /*[
                 {'fillStyle' : 'green', 'text' : '0'},
                 {'fillStyle' : 'black', 'text' : '28'},
                 {'fillStyle' : 'red', 'text' : '9'},
@@ -51,7 +65,7 @@ class Ruleta {
                 {'fillStyle' : 'red', 'text' : '14'},
                 {'fillStyle' : 'black', 'text' : '2'}
             
-            ]
+            ]*/
         });
 
         this.outerWheel = new Winwheel({
