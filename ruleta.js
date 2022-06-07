@@ -14,7 +14,6 @@ class Ruleta {
                 'text': element.number
             }
         });
-        console.log(Rulette_sectors)
         this.wheelSpinning = false;
         this.callback_winner = callback_winner;
         this.innerWheel = new Winwheel({
@@ -25,6 +24,7 @@ class Ruleta {
             'textAlignment': 'outer',
             // 'textOrientation': 'curved', 
             'segments': rulette_segments,
+            'drawMode': 'image',
             'animation': {
               'type': 'spinToStop',                     // Define animation more or less as normal, except for the callbackAfter().
               'duration': 5,
@@ -60,7 +60,7 @@ class Ruleta {
         })
     }
 
-        // This function is called after the outer wheel has drawn during the animation.
+    // This function is called after the outer wheel has drawn during the animation.
     drawInnerWheel( ) {
         // this.outerWheel.rotationAngle = this.innerWheel.rotationAngle;
     }
