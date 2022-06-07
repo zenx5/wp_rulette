@@ -1,0 +1,30 @@
+{
+    "name": "zenx5/wp_rulette",
+    "description": "Plugins para agregar ruleta con base en winwheel.js",
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "clases/class_wp_rulette.php"
+        ],
+        "psr-4": {
+            "Zenx5\\Rullete\\": "clases/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Octavio Martinez",
+            "email": "omartinez1618@gmail.com",
+            "homepage": "https://github.com/zenx5",
+            "role": "Backend Developer"
+        }
+    ],
+    "require": {
+        "zenx5/plugink": "dev-main"
+    },
+    "repositories": [
+        {
+            "type":"vcs",
+            "url": "https://github.com/zenx5/plugin-base-k.git"
+        }
+    ]
+}
