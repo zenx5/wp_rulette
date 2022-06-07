@@ -94,8 +94,11 @@ class Ruleta {
         }
     }
 }
-new Ruleta({
-    callback_winner: data => {
-        console.log(data)
-    }
+
+addEventListener('load', ev => {
+    new Ruleta({
+        callback_winner: data => {
+            console.log(data)
+        }
+    })
 })
