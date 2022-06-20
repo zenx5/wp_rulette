@@ -41,7 +41,8 @@ class WP_Rulette extends Plugink
                 'color' => $metas['wp_rulette_color'][0],
                 'order' => $metas['wp_rulette_order'][0],
                 'image_file' => $metas['wp_rulette_image_file'][0],
-                'image' => $metas['wp_rulette_image'][0]
+                'image_path' => $metas['wp_rulette_image_path'][0],
+                'image_name' => $metas['wp_rulette_image_name'][0]
             );
             $datas[] = $data;
         };
@@ -86,7 +87,8 @@ class WP_Rulette extends Plugink
     {
         update_post_meta($post_id, "wp_rulette_number", $_POST['wp_rulette_number']);
         update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
-        update_post_meta($post_id, "wp_rulette_image", $_POST['wp_rulette_image']);
+        update_post_meta($post_id, "wp_rulette_image_name", $_POST['wp_rulette_image_name']);
+        update_post_meta($post_id, "wp_rulette_image_path", $_POST['wp_rulette_image_path']);
         update_post_meta($post_id, "wp_rulette_image_file", $_POST['wp_rulette_image_file']);
         update_post_meta($post_id, "wp_rulette_order", $_POST['wp_rulette_order']);
         //die();
