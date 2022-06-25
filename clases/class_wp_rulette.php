@@ -38,7 +38,7 @@ class WP_Rulette extends Plugink
             $metas = get_post_meta($post->ID);
             $data = array(
                 'name' => $post->post_title,
-                'tag' => $metas['wp_rulette_tag'][0],
+                'tag' => $metas['wp_rulette_tag'][0] ? $metas['wp_rulette_tag'][0] : $metas['wp_rulette_number'][0],
                 'color' => $metas['wp_rulette_color'][0],
                 'order' => $metas['wp_rulette_order'][0],
                 'image_file' => $metas['wp_rulette_image_file'][0],
