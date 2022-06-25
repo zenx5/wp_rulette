@@ -10,7 +10,7 @@ class Ruleta {
         .map( element => {
             return {
                 'fillStyle': element.color,
-                'text': element.number
+                'text': element.tag
             }
         });
         this.desfase = -4;
