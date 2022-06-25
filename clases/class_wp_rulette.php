@@ -81,10 +81,10 @@ class WP_Rulette extends Plugink
                 font-weight: bold;
                 color: white;
                 cursor: pointer;
-                opacity: 0.7;
+                opacity: 0.6;
             }
 
-            .board-tag .selected {
+            .board-tag.selected {
                 opacity: 1;
             }
         </style>
@@ -158,10 +158,9 @@ class WP_Rulette extends Plugink
                 document.querySelector('.board-container')
                     .addEventListener('click', function(ev) {
                         const target = ev.target;
+                        document.querySelectorAll('board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
                         if (target.className === 'board-tag') {
                             target.setAttribute('class', 'board-tag selected');
-                        } else {
-                            target.setAttribute('class', 'board-tag');
                         }
                     });
 
