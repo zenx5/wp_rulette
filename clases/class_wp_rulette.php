@@ -16,13 +16,14 @@ class WP_Rulette extends Plugink
 
     public static function init()
     {
-        self::create_rulette_type();
+        self::create_types();
         add_action('add_meta_boxes_rulette_sector', array('WP_Rulette', 'create_metas'));
         add_action('save_post', array('WP_Rulette', 'save_post'));
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
         add_action('wp_head', array('WP_Rulette', 'get_sectores'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
+        add_shortcode('sector_board', array('WP_Rulette', 'board'));
         // self::save_post( );
     }
 
@@ -77,10 +78,25 @@ class WP_Rulette extends Plugink
                 </td>
             </tr>
         </table>
-<?php
+    <?php
         $html = ob_get_contents();
         ob_end_clean();
         return $html;
+    }
+
+    public static function board()
+    {
+    ?>
+        <table>
+            <tr>
+                <th>Animalitos</th>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+
+<?php
     }
 
     public static function save_post($post_id, $post = null)
@@ -94,7 +110,7 @@ class WP_Rulette extends Plugink
         //die();
     }
 
-    public static function create_rulette_type()
+    public static function create_types()
     {
         self::create_type_post('rulette_sector', 'sector de la ruleta', 'sectores de la ruleta', [
             'description' => 'Define los diferentes sectores de la ruleta',
@@ -141,7 +157,6 @@ class WP_Rulette extends Plugink
                     include WP_PLUGIN_DIR . '/wp_rulette/metas/order.php';
                 }
             ]
-
         ]);
     }
 }
