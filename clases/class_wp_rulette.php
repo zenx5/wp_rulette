@@ -38,7 +38,7 @@ class WP_Rulette extends Plugink
             $metas = get_post_meta($post->ID);
             $data = array(
                 'name' => $post->post_title,
-                'number' => $metas['wp_rulette_number'][0],
+                'tag' => $metas['wp_rulette_tag'][0],
                 'color' => $metas['wp_rulette_color'][0],
                 'order' => $metas['wp_rulette_order'][0],
                 'image_file' => $metas['wp_rulette_image_file'][0],
@@ -80,6 +80,7 @@ class WP_Rulette extends Plugink
                 text-align: center;
                 font-weight: bold;
                 color: white;
+                cursor: pointer;
             }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
@@ -152,7 +153,7 @@ class WP_Rulette extends Plugink
 
     public static function save_post($post_id, $post = null)
     {
-        update_post_meta($post_id, "wp_rulette_number", $_POST['wp_rulette_number']);
+        update_post_meta($post_id, "wp_rulette_tag", $_POST['wp_rulette_tag']);
         update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
         update_post_meta($post_id, "wp_rulette_image_name", $_POST['wp_rulette_image_name']);
         update_post_meta($post_id, "wp_rulette_image_path", $_POST['wp_rulette_image_path']);
