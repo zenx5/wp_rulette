@@ -140,14 +140,14 @@ class WP_Rulette extends Plugink
                     $color = $sector['color'];
                     if ($columnCount == 0) {
                         echo "<div class='board-row'>";
-                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['number'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
                         $columnCount++;
                     } elseif ($columnCount == $byRow - 1) {
-                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['number'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
                         echo "</div>";
                         $columnCount = 0;
                     } else {
-                        echo "<div class='board-tag' style='width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%'>" . $sector['tag'] . "</div>";
                         $columnCount++;
                     }
                 } ?>
@@ -223,7 +223,7 @@ class WP_Rulette extends Plugink
             [
                 'title' => 'numero',
                 'render_callback' => function () {
-                    include WP_PLUGIN_DIR . '/wp_rulette/metas/number.php';
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/tag.php';
                 }
             ],
             [
