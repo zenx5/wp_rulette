@@ -1,12 +1,10 @@
 <?php
 
-require 'class_plugink.php';
-
-
-class WP_Rulette extends PluginK
+class WP_Rulette extends Plugink
 {
     public static function active()
     {
+
         //add_action('init', array('WP_Subsk', 'create_subs_type'));
         //add_action('admin_head', array('WP_Subsk', 'insert_uicomponents'));
         //add_action('add_meta_boxes_subs_types', array('WP_Subsk', 'create_metas'));
@@ -24,17 +22,18 @@ class WP_Rulette extends PluginK
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
         add_action('wp_head', array('WP_Rulette', 'get_sectores'));
-        add_shortcode( 'rulette', array('WP_Rulette', 'render_rulette') );
+        add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         // self::save_post( );
     }
 
-    public static function get_sectores( ) {
-        $datas = array( );
-        $query = new WP_Query( array(
+    public static function get_sectores()
+    {
+        $datas = array();
+        $query = new WP_Query(array(
             'post_type' => 'rulette_sector',
             'posts_per_page' => -1
         ));
-        foreach ( $query->posts as $post ) {
+        foreach ($query->posts as $post) {
             $metas = get_post_meta($post->ID);
             $data = array(
                 'name' => $post->post_title,
@@ -44,18 +43,22 @@ class WP_Rulette extends PluginK
             );
             $datas[] = $data;
         };
-    ?>
+?>
+        <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
         <script type="text/javascript">
-            var Rulette_sectors = <?= json_encode( $datas ); ?>;
+            var Rulette_sectors = <?= json_encode($datas); ?>;
             console.log(Rulette_sectors)
         </script>
+        <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>
     <?php
     }
 
     public static function render_rulette()
     {
         ob_start();
-?>
+    ?>
         <table cellpadding="0" cellspacing="0" border="0">
             <tr>
                 <td>
@@ -64,15 +67,11 @@ class WP_Rulette extends PluginK
                         <button id="btn_spin">lanzar</button>
                     </div>
                 </td>
-                <td width="438" height="582" class="the_wheel" align="center" valign="center">
+                <td width="438" height="582" class="the_wheel" style="text-align:center" valign="center">
                     <canvas id="canvas" width="434" height="434">
-                        <p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                        <p style="color: white; text-align:center">Sorry, your browser doesn't support canvas. Please try another.</p>
                     </canvas>
                 </td>
-                <link href="main.css" />
-                <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-                <script type="text/javascript" src="http://localhost/ruleta/wp-content/plugins/wp_rulette/Winwheel.min.js"></script>
-                <script src="http://localhost/ruleta/wp-content/plugins/wp_rulette/ruleta.js"></script>
             </tr>
         </table>
 <?php
@@ -116,25 +115,25 @@ class WP_Rulette extends PluginK
             [
                 'title' => 'color',
                 'render_callback' => function () {
-                    include 'metas/color.php';
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/color.php';
                 }
             ],
             [
                 'title' => 'numero',
                 'render_callback' => function () {
-                    include 'metas/number.php';
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/number.php';
                 }
             ],
             [
                 'title' => 'image',
                 'render_callback' => function () {
-                    include 'metas/image.php';
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/image.php';
                 }
             ],
             [
                 'title' => 'order',
                 'render_callback' => function () {
-                    include 'metas/order.php';
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/order.php';
                 }
             ]
 
