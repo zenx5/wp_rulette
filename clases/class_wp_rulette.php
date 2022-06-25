@@ -81,6 +81,11 @@ class WP_Rulette extends Plugink
                 font-weight: bold;
                 color: white;
                 cursor: pointer;
+                opacity: 0.7;
+            }
+
+            .board-tag .selected {
+                opacity: 1;
             }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
@@ -148,6 +153,30 @@ class WP_Rulette extends Plugink
                 } ?>
             </div>
         </div>
+        <script>
+            (function($) {
+                $('.board-tag').click(function() {
+                    if ($(this).attr('class') === 'board-tag') {
+                        $(this).attr('class', 'board-tag selected');
+                    } else {
+                        $(this).attr('class', 'board-tag');
+                    }
+
+                    /*
+                    AQUI LA CREACION DE LA JUGADA POR METODO POST
+                        $.ajax({
+                            method: 'post',
+                            url: url de api,
+                            data: {
+                                tag: $(this).text(),
+                                value: $('#value').val(),
+                                user: $('#user').data('id')
+                            }
+                        })
+                    */
+                })
+            })(jQuery)
+        </script>
 <?php
     }
 
