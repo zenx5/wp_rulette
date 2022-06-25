@@ -3,8 +3,12 @@ class Ruleta {
         callback_winner,
         canvasId
     } = {}) {
-        let rulette_segments = Rulette_sectors
-        .sort( (elemA, elemB) => {
+        this.rulette_segments = Rulette_sectors.map( elem => elem )
+        Rulette_sectors.sort( (elemA, elemB) => {
+            return elemA.number - elemB.number
+        });
+        console.log(Rulette_sectors)
+        let rulette_segments = this.rulette_segments.sort( (elemA, elemB) => {
             return elemA.order - elemB.order
         })
         .map( element => {
@@ -13,7 +17,7 @@ class Ruleta {
                 'text': element.number
             }
         });
-        this.desfase = -4;
+        console.log(this.rulette_segments)
         this.wheelSpinning = false;
         this.callback_winner = callback_winner;
         this.innerWheel = new Winwheel({
@@ -57,20 +61,19 @@ class Ruleta {
         LoadedImg.onload = _ => {
             this.outerWheel.wheelImage = LoadedImg;
             this.outerWheel.draw( );
-            this.innerWheel.rotationAngle += this.desfase;
             this.innerWheel.draw(false);
         }
 
         this.innerWheel.draw();
 
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
-            this.startSpin( )
+            this.initSpin( )
         })
     }
 
     // This function is called after the outer wheel has drawn during the animation.
     drawInnerWheel( ) {
-        this.outerWheel.rotationAngle = this.innerWheel.rotationAngle-this.desfase;
+        this.outerWheel.rotationAngle = this.innerWheel.rotationAngle;
         this.outerWheel.draw( );
         this.innerWheel.draw(false);
     }
@@ -78,28 +81,43 @@ class Ruleta {
     // Called when the animation has finished.
     alertPrize( ) {
         var winningInnerSegment = +this.innerWheel.getIndicatedSegment().text;
-        // var winningOuterSegment = this.outerWheel.getIndicatedSegment();
+        let winner;
+        console.log(winningInnerSegment)
+        winner = winningInnerSegment;
 
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( Rulette_sectors[ winningInnerSegment -1 ] );
+        this.callback_winner && this.callback_winner( Rulette_sectors[ winner ] );
     }
+
+    getRandomNumber( min , max , numDecimales=15 ) {
+        return Math.random( )*( max - min ) + min;
+    }
+
+    initSpin( ) {
+        this.startSpin( this.getAnimalAngle(5) )
+    }
+
+    getAnimalAngle( value ) {
+        let pos = this.rulette_segments.findIndex( element => element.number == value );
+        let delta_angle = 360/this.rulette_segments.length;
+        let angle = this.getRandomNumber( pos*delta_angle, (pos+1)*delta_angle )
+        return angle;
+    }
+
     // -------------------------------------------------------
     // Click handler for spin button.
     // -------------------------------------------------------
-    startSpin( ) {
+    startSpin( value ) {
         // Ensure that spinning can't be clicked again while already running.
         if ( this.wheelSpinning == false ) {
             // Reset things with inner and outer wheel so spinning will work as expected. Without the reset the
             // wheel will probably just move a small amount since the rotationAngle would be close to the targetAngle
             // figured out by the animation.
-            // this.outerWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
-            // this.outerWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
-            // this.outerWheel.draw();                // Call draw to render changes to the wheel.
             this.innerWheel.rotationAngle = 0;
-            this.innerWheel.draw();
+            this.innerWheel.animation.stopAngle = value;
+            this.innerWheel.draw( );
 
-            this.innerWheel.startAnimation();
-
+            this.innerWheel.startAnimation( );
             this.wheelSpinning = true;
         }
     }
@@ -107,7 +125,7 @@ class Ruleta {
 
 addEventListener('load', ev => {
     new Ruleta({
-        callback_winner: data => {
+        callback_winner: function( data ) {
             console.log(data)
         }
     })
