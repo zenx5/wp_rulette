@@ -74,6 +74,13 @@ class WP_Rulette extends Plugink
                 width: 100%;
                 justify-content: space-around;
             }
+
+            .board-tag {
+                border: 1px solid #0005;
+                text-align: center;
+                font-weight: bold;
+                color: white;
+            }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
         <script type="text/javascript">
@@ -124,16 +131,17 @@ class WP_Rulette extends Plugink
             </div>
             <div class="board-content">
                 <?php foreach ($sectores as $sector) {
+                    $color = $sector['color'];
                     if ($columnCount == 0) {
                         echo "<div class='board-row'>";
-                        echo "<div style='border: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['number'] . "</div>";
                         $columnCount++;
                     } elseif ($columnCount == $byRow - 1) {
-                        echo "<div style='border: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['number'] . "</div>";
                         echo "</div>";
                         $columnCount = 0;
                     } else {
-                        echo "<div style='border: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%'>" . $sector['number'] . "</div>";
                         $columnCount++;
                     }
                 } ?>
