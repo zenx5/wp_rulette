@@ -94,29 +94,28 @@ class WP_Rulette extends Plugink
         $sectores = self::get_sectores();
         $byRow = 3;
         $columnCount = 0;
+        $width = 100 / $byRow;
     ?>
-        <div>
-            <table style="margin-bottom: 0;">
-                <tr>
-                    <th>Board</th>
-                </tr>
-            </table>
-            <table>
+        <div style="display: flex; flex-direction:column; align-items:center">
+            <div style="display: flex; flex-direction: row; width: 100%; justify-content:center;">
+                <h3>Board</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; width: 100%;">
                 <?php foreach ($sectores as $sector) {
                     if ($columnCount == 0) {
-                        echo "<tr>";
-                        echo "<td>" . $sector['number'] . "</td>";
+                        echo "<div style='display:flex; flex-direction: row; width:100%; justify-content:space-around;'>";
+                        echo "<div style='text-align:center; width:$width%'>" . $sector['number'] . "</div>";
                         $columnCount++;
                     } elseif ($columnCount == $byRow - 1) {
-                        echo "<td>" . $sector['number'] . "</td>";
-                        echo "</tr>";
+                        echo "<div style='text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "</div>";
                         $columnCount = 0;
                     } else {
-                        echo "<td>" . $sector['number'] . "</td>";
+                        echo "<div style='text-align:center; width:$width%'>" . $sector['number'] . "</div>";
                         $columnCount++;
                     }
                 } ?>
-            </table>
+            </div>
         </div>
 <?php
     }
