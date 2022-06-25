@@ -60,7 +60,7 @@ class WP_Rulette extends Plugink
                 align-items: center
             }
 
-            .boad-content {
+            .board-content {
                 display: flex;
                 width: 100%;
                 align-items: center;
@@ -73,8 +73,6 @@ class WP_Rulette extends Plugink
                 flex-direction: row;
                 width: 100%;
                 justify-content: space-around;
-                border-top: 1px solid #0005;
-                border-bottom: 1px solid #0005;
             }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
@@ -128,14 +126,14 @@ class WP_Rulette extends Plugink
                 <?php foreach ($sectores as $sector) {
                     if ($columnCount == 0) {
                         echo "<div class='board-row'>";
-                        echo "<div style='text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div style='border: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
                         $columnCount++;
                     } elseif ($columnCount == $byRow - 1) {
-                        echo "<div style='text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div style='border: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
                         echo "</div>";
                         $columnCount = 0;
                     } else {
-                        echo "<div style='border-right: 1px solid #0005; border-left: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
+                        echo "<div style='border: 1px solid #0005; text-align:center; width:$width%'>" . $sector['number'] . "</div>";
                         $columnCount++;
                     }
                 } ?>
