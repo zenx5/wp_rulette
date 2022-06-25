@@ -21,9 +21,9 @@ class WP_Rulette extends Plugink
         add_action('save_post', array('WP_Rulette', 'save_post'));
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
-        add_action('wp_head', array('WP_Rulette', 'get_sectores'));
+        add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
-        add_shortcode('sector_board', array('WP_Rulette', 'board'));
+        add_shortcode('rulette_board', array('WP_Rulette', 'board'));
         // self::save_post( );
     }
 
@@ -47,10 +47,15 @@ class WP_Rulette extends Plugink
             );
             $datas[] = $data;
         };
+        return $datas;
+    }
+
+    public static function head()
+    {
 ?>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
         <script type="text/javascript">
-            var Rulette_sectors = <?= json_encode($datas); ?>;
+            var Rulette_sectors = <?= json_encode(self::get_sectores()); ?>;
             console.log(Rulette_sectors)
         </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
@@ -86,16 +91,33 @@ class WP_Rulette extends Plugink
 
     public static function board()
     {
+        $sectores = self::get_sectores();
+        $byRow = 3;
+        $columnCount = 0;
     ?>
-        <table>
-            <tr>
-                <th>Animalitos</th>
-            </tr>
-            <tr>
-                <td></td>
-            </tr>
-        </table>
-
+        <div>
+            <table style="margin-bottom: 0;">
+                <tr>
+                    <th>Board</th>
+                </tr>
+            </table>
+            <table>
+                <?php foreach ($sectores as $sector) {
+                    if ($columnCount == 0) {
+                        echo "<tr>";
+                        echo "<td>" . $sector['number'] . "</td>";
+                        $columnCount++;
+                    } elseif ($columnCount == $byRow - 1) {
+                        echo "<td>" . $sector['number'] . "</td>";
+                        echo "</tr>";
+                        $columnCount = 0;
+                    } else {
+                        echo "<td>" . $sector['number'] . "</td>";
+                        $columnCount++;
+                    }
+                } ?>
+            </table>
+        </div>
 <?php
     }
 
