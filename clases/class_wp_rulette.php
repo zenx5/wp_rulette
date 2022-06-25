@@ -147,35 +147,40 @@ class WP_Rulette extends Plugink
                         echo "</div>";
                         $columnCount = 0;
                     } else {
-                        echo "<div class='board-tag' style='width:$width%'>" . $sector['tag'] . "</div>";
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
                         $columnCount++;
                     }
                 } ?>
             </div>
         </div>
         <script>
-            (function($) {
-                $('.board-tag').click(function() {
-                    if ($(this).attr('class') === 'board-tag') {
-                        $(this).attr('class', 'board-tag selected');
-                    } else {
-                        $(this).attr('class', 'board-tag');
-                    }
+            (function() {
+                document.querySelector('.board-container')
+                    .addEventListener('click', function(ev) {
+                        const target = ev.target;
+                        if (target.className === 'board-tag') {
+                            target.setAttribute('class', 'board-tag selected');
+                        } else {
+                            target.setAttribute('class', 'board-tag');
+                        }
+                    });
 
-                    /*
-                    AQUI LA CREACION DE LA JUGADA POR METODO POST
-                        $.ajax({
-                            method: 'post',
-                            url: url de api,
-                            data: {
-                                tag: $(this).text(),
-                                value: $('#value').val(),
-                                user: $('#user').data('id')
-                            }
-                        })
-                    */
-                })
-            })(jQuery)
+
+
+                /*
+                AQUI LA CREACION DE LA JUGADA POR METODO POST
+                    $.ajax({
+                        method: 'post',
+                        url: url de api,
+                        data: {
+                            tag: $(this).text(),
+                            value: $('#value').val(),
+                            user: $('#user').data('id')
+                        }
+                    })
+                */
+
+            })();
         </script>
 <?php
     }
@@ -221,7 +226,7 @@ class WP_Rulette extends Plugink
                 }
             ],
             [
-                'title' => 'numero',
+                'title' => 'Tag',
                 'render_callback' => function () {
                     include WP_PLUGIN_DIR . '/wp_rulette/metas/tag.php';
                 }
