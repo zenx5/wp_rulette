@@ -16,14 +16,29 @@ class WP_Rulette extends Plugink
 
     public static function init()
     {
-        self::create_rulette_type();
+        self::create_types();
         add_action('add_meta_boxes_rulette_sector', array('WP_Rulette', 'create_metas'));
         add_action('save_post', array('WP_Rulette', 'save_post'));
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
-        add_action('wp_head', array('WP_Rulette', 'get_sectores'));
+        add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
-        // self::save_post( );
+        add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_action('wp_ajax_endpoint', array('WP_Rulette', 'uploadImage'));
+        add_action('wp_ajax_nopriv_endpoint', array('WP_Rulette', 'uploadImage'));
+    }
+
+    public static function uploadImage( ) {
+    $name = $_POST['name'];
+    echo $name;
+    die( );
+        $cont=0;
+        // ciclo para recorrer el array de imagenes
+        foreach ($_FILES["img_extra"]["name"] as $key => $value) {
+            //Se copian los archivos de la carpeta temporal del servidor a su ubicación final
+            move_uploaded_file($_FILES["img_extra"]["tmp_name"][$key], "img/".$_FILES["img_extra"]["name"][$key]);
+            $cont++;
+        }
     }
 
     public static function get_sectores()
@@ -37,7 +52,7 @@ class WP_Rulette extends Plugink
             $metas = get_post_meta($post->ID);
             $data = array(
                 'name' => $post->post_title,
-                'number' => $metas['wp_rulette_number'][0],
+                'tag' => $metas['wp_rulette_tag'][0],
                 'color' => $metas['wp_rulette_color'][0],
                 'order' => $metas['wp_rulette_order'][0],
                 'image_file' => $metas['wp_rulette_image_file'][0],
@@ -46,10 +61,50 @@ class WP_Rulette extends Plugink
             );
             $datas[] = $data;
         };
+        return $datas;
+    }
+
+    public static function head()
+    {
 ?>
+        <style>
+            .board-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center
+            }
+
+            .board-content {
+                display: flex;
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
+
+            .board-row {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .board-tag {
+                border: 1px solid #0005;
+                text-align: center;
+                font-weight: bold;
+                color: white;
+                cursor: pointer;
+                opacity: 0.6;
+            }
+
+            .board-tag.selected {
+                opacity: 1;
+            }
+        </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
         <script type="text/javascript">
-            var Rulette_sectors = <?= json_encode($datas); ?>;
+            var Rulette_sectors = <?= json_encode(self::get_sectores()); ?>;
             console.log(Rulette_sectors)
         </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
@@ -77,15 +132,75 @@ class WP_Rulette extends Plugink
                 </td>
             </tr>
         </table>
-<?php
+    <?php
         $html = ob_get_contents();
         ob_end_clean();
         return $html;
     }
 
+    public static function board()
+    {
+        $sectores = self::get_sectores();
+        $byRow = 3;
+        $columnCount = 0;
+        $width = 100 / $byRow;
+    ?>
+        <div class="board-container">
+            <div class="board-content">
+                <h3>Board</h3>
+            </div>
+            <div class="board-content">
+                <?php foreach ($sectores as $sector) {
+                    $color = $sector['color'];
+                    if ($columnCount == 0) {
+                        echo "<div class='board-row'>";
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                        $columnCount++;
+                    } elseif ($columnCount == $byRow - 1) {
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                        echo "</div>";
+                        $columnCount = 0;
+                    } else {
+                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                        $columnCount++;
+                    }
+                } ?>
+            </div>
+        </div>
+        <script>
+            (function() {
+                document.querySelector('.board-container')
+                    .addEventListener('click', function(ev) {
+                        const target = ev.target;
+                        document.querySelectorAll('board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
+                        if (target.className === 'board-tag') {
+                            target.setAttribute('class', 'board-tag selected');
+                        }
+                    });
+
+
+
+                /*
+                AQUI LA CREACION DE LA JUGADA POR METODO POST
+                    $.ajax({
+                        method: 'post',
+                        url: url de api,
+                        data: {
+                            tag: $(this).text(),
+                            value: $('#value').val(),
+                            user: $('#user').data('id')
+                        }
+                    })
+                */
+
+            })();
+        </script>
+<?php
+    }
+
     public static function save_post($post_id, $post = null)
     {
-        update_post_meta($post_id, "wp_rulette_number", $_POST['wp_rulette_number']);
+        update_post_meta($post_id, "wp_rulette_tag", $_POST['wp_rulette_tag']);
         update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
         update_post_meta($post_id, "wp_rulette_image_name", $_POST['wp_rulette_image_name']);
         update_post_meta($post_id, "wp_rulette_image_src", $_POST['wp_rulette_image_src']);
@@ -94,7 +209,7 @@ class WP_Rulette extends Plugink
         //die();
     }
 
-    public static function create_rulette_type()
+    public static function create_types()
     {
         self::create_type_post('rulette_sector', 'sector de la ruleta', 'sectores de la ruleta', [
             'description' => 'Define los diferentes sectores de la ruleta',
@@ -124,9 +239,9 @@ class WP_Rulette extends Plugink
                 }
             ],
             [
-                'title' => 'numero',
+                'title' => 'Tag',
                 'render_callback' => function () {
-                    include WP_PLUGIN_DIR . '/wp_rulette/metas/number.php';
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/tag.php';
                 }
             ],
             [
@@ -141,7 +256,6 @@ class WP_Rulette extends Plugink
                     include WP_PLUGIN_DIR . '/wp_rulette/metas/order.php';
                 }
             ]
-
         ]);
     }
 }

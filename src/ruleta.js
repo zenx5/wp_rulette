@@ -14,7 +14,7 @@ class Ruleta {
         .map( element => {
             return {
                 'fillStyle': element.color,
-                'text': element.number
+                'text': element.tag
             }
         });
         console.log(this.rulette_segments)
