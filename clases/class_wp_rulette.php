@@ -29,9 +29,9 @@ class WP_Rulette extends Plugink
     }
 
     public static function uploadImage( ) {
-    $name = $_POST['name'];
-    echo $name;
-    die( );
+    // $name = $_POST['name'];
+    // echo $name;
+    // die( );
         $cont=0;
         // ciclo para recorrer el array de imagenes
         foreach ($_FILES["img_extra"]["name"] as $key => $value) {
@@ -39,6 +39,7 @@ class WP_Rulette extends Plugink
             move_uploaded_file($_FILES["img_extra"]["tmp_name"][$key], "img/".$_FILES["img_extra"]["name"][$key]);
             $cont++;
         }
+        wp_die( );
     }
 
     public static function get_sectores()
@@ -56,7 +57,7 @@ class WP_Rulette extends Plugink
                 'color' => $metas['wp_rulette_color'][0],
                 'order' => $metas['wp_rulette_order'][0],
                 'image_file' => $metas['wp_rulette_image_file'][0],
-                'image_path' => $metas['wp_rulette_image_src'][0],
+                'image_src' => $metas['wp_rulette_image_src'][0],
                 'image_name' => $metas['wp_rulette_image_name'][0]
             );
             $datas[] = $data;
