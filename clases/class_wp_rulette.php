@@ -18,6 +18,7 @@ class WP_Rulette extends Plugink
     {
         self::create_types();
         add_action('add_meta_boxes_rulette_sector', array('WP_Rulette', 'create_metas'));
+        add_action('add_meta_boxes_rulette_level', array('WP_Rulette', 'create_metas'));
         add_action('save_post', array('WP_Rulette', 'save_post'));
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
@@ -65,6 +66,23 @@ class WP_Rulette extends Plugink
         return $datas;
     }
 
+    public static function get_level( ) {
+        $datas = array( );
+        $query = new WP_Query( array(
+            'post_type' => 'rulette_level',
+            'posts_per_page' => -1
+        ));
+        foreach( $query->posts as $post ) {
+            $metas = get_post_meta( $post->ID );
+            $data = array(
+                'level' => $post->post_title,
+                'restart' => $metas['wp_rulette_restart'][0]
+            );
+            $datas[] = $data;
+        };
+        return $datas;
+    }
+
     public static function head()
     {
 ?>
@@ -106,7 +124,8 @@ class WP_Rulette extends Plugink
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
         <script type="text/javascript">
             var Rulette_sectors = <?= json_encode(self::get_sectores()); ?>;
-            console.log(Rulette_sectors)
+            var Rulette_levels = <?= json_encode(self::get_level()); ?>;
+            console.log(Rulette_levels)
         </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
@@ -201,12 +220,18 @@ class WP_Rulette extends Plugink
 
     public static function save_post($post_id, $post = null)
     {
-        update_post_meta($post_id, "wp_rulette_tag", $_POST['wp_rulette_tag']);
-        update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
-        update_post_meta($post_id, "wp_rulette_image_name", $_POST['wp_rulette_image_name']);
-        update_post_meta($post_id, "wp_rulette_image_src", $_POST['wp_rulette_image_src']);
-        update_post_meta($post_id, "wp_rulette_image_file", $_POST['wp_rulette_image_file']);
-        update_post_meta($post_id, "wp_rulette_order", $_POST['wp_rulette_order']);
+        if("rulette_sector"  == get_post_type()) {
+            update_post_meta($post_id, "wp_rulette_tag", $_POST['wp_rulette_tag']);
+            update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
+            update_post_meta($post_id, "wp_rulette_image_name", $_POST['wp_rulette_image_name']);
+            update_post_meta($post_id, "wp_rulette_image_path", $_POST['wp_rulette_image_path']);
+            update_post_meta($post_id, "wp_rulette_image_file", $_POST['wp_rulette_image_file']);
+            update_post_meta($post_id, "wp_rulette_order", $_POST['wp_rulette_order']);
+        }
+        elseif( 'rulette_level' == get_post_type( ) ) {
+            update_post_meta( $post_id, "wp_rulette_restart", $_POST['wp_rulette_restart']);
+        }
+
         //die();
     }
 
@@ -214,6 +239,22 @@ class WP_Rulette extends Plugink
     {
         self::create_type_post('rulette_sector', 'sector de la ruleta', 'sectores de la ruleta', [
             'description' => 'Define los diferentes sectores de la ruleta',
+            'public'       => false,
+            'can_export'   => false,
+            'show_ui'      => true,
+            'show_in_menu' => true,
+            'query_var'    => false,
+            'rewrite'      => false,
+            'has_archive'  => false,
+            'hierarchical' => false,
+            'supports'     => array('title'),
+            //'menu_icon'    => pods_svg_icon('pods'),
+            //'menu_position' => 5,
+            'show_in_nav_menus' => false,
+        ]);
+
+        self::create_type_post('rulette_level', 'Nivel de la ruleta', 'Niveles de la ruleta', [
+            'description' => 'Define los diferentes niveles de dificulta de la ruleta',
             'public'       => false,
             'can_export'   => false,
             'show_ui'      => true,
@@ -255,6 +296,21 @@ class WP_Rulette extends Plugink
                 'title' => 'order',
                 'render_callback' => function () {
                     include WP_PLUGIN_DIR . '/wp_rulette/metas/order.php';
+                }
+            ]
+        ]);
+
+        self::create_meta('rulette_level', [
+            [
+                'title' => 'Relanzamientos',
+                'render_callback' => function () {
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/restart.php';
+                }
+            ],
+            [
+                'title' => 'Función personalizada',
+                'render_callback' => function () {
+                    include WP_PLUGIN_DIR . '/wp_rulette/metas/custom_function.php';
                 }
             ]
         ]);

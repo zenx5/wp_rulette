@@ -3,7 +3,8 @@ class Ruleta {
         callback_winner,
         canvasId,
         jugadas,
-        dificultad
+        dificultad,
+        levels
     } = {}) {
         this.rulette_sectors = Rulette_sectors;
         this.rulette_segments = Rulette_sectors.map( elem => elem )
@@ -22,7 +23,7 @@ class Ruleta {
             }
         });
 
-        console.log(this.rulette_segments)
+        this.levels = levels;
         this.wheelSpinning = false;
         this.callback_winner = callback_winner;
         this.dificultad = dificultad;
@@ -95,9 +96,6 @@ class Ruleta {
         this.wheelSpinning = false;
         this.callback_winner && this.callback_winner( Rulette_sectors[ winner ] );
     }
-getRandomNumber( min , max , numDecimales=15 ) {
-        return Math.random( )*( max - min ) + min;
-    }
 
     initSpin( ) {
         let index;
@@ -106,13 +104,6 @@ getRandomNumber( min , max , numDecimales=15 ) {
         switch( this.dificultad ) {
             case 'ease':
                 index = null;
-                break;
-
-            case 'medium':
-                array_temp = [ ...this.jugadas, ...this.rulette_sectors ];
-                console.log(array_temp);
-                value = Math.floor( getRandomNumber( 0, array_temp.length ) )
-                index = value.tag;
                 break;
                 
             case 'hard':
@@ -136,8 +127,21 @@ getRandomNumber( min , max , numDecimales=15 ) {
                 console.log(array_arrays)
                 index = array_arrays[0][0].tag;
                 break;
+
+            default :
+                let level_index = this.levels.findIndex( element => element.level == this.dificultad );
+                let level = this.levels[ level_index ];
+                for( let i=0; i<level.restart; i++ ) {
+                    index = GetRandomInteger( 0, this.rulette_sectors.length-1 );
+                    console.log(index)
+                    if( this.jugadas.findIndex( element => element.tag == index ) == -1 ) {
+                        console.log("break")
+                        break;
+                    }
+                }
+                break;
         }
-        this.startSpin( index );
+        this.startSpin( this.getAnimalAngle( index ) );
     }
 
     getAnimalAngle( value ) {
@@ -201,6 +205,7 @@ addEventListener('load', ev => {
             console.log(data)
         },
         jugadas: jugadas,
-        dificultad: 'hard'  //ease, medium, hard
+        levels: Rulette_levels,
+        dificultad: 'medium'  //ease, medium, hard
     })
 })
