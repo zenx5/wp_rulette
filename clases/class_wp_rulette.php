@@ -25,8 +25,8 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
-        add_action('wp_ajax_endpoint', array('WP_Rulette', 'uploadImage'));
-        add_action('wp_ajax_nopriv_endpoint', array('WP_Rulette', 'uploadImage'));
+        // add_action('wp_ajax_endpoint', array('WP_Rulette', 'uploadImage'));
+        // add_action('wp_ajax_nopriv_endpoint', array('WP_Rulette', 'uploadImage'));
     }
 
     public static function uploadImage( ) {
@@ -224,7 +224,7 @@ class WP_Rulette extends Plugink
             update_post_meta($post_id, "wp_rulette_tag", $_POST['wp_rulette_tag']);
             update_post_meta($post_id, "wp_rulette_color", $_POST['wp_rulette_color']);
             update_post_meta($post_id, "wp_rulette_image_name", $_POST['wp_rulette_image_name']);
-            update_post_meta($post_id, "wp_rulette_image_path", $_POST['wp_rulette_image_path']);
+            update_post_meta($post_id, "wp_rulette_image_src", $_POST['wp_rulette_image_src']);
             update_post_meta($post_id, "wp_rulette_image_file", $_POST['wp_rulette_image_file']);
             update_post_meta($post_id, "wp_rulette_order", $_POST['wp_rulette_order']);
         }

@@ -6,17 +6,13 @@ class Ruleta {
         dificultad,
         levels
     } = {}) {
-        this.rulette_sectors = Rulette_sectors;
-        this.rulette_segments = Rulette_sectors.map( elem => elem )
-        Rulette_sectors.sort( (elemA, elemB) => {
-            return elemA.tag - elemB.tag
-        });
+        this.rulette_sectors = Rulette_sectors.map( elem => elem );
+        this.rulette_segments = Rulette_sectors.map( elem => elem );
 
-        console.log(Rulette_sectors)
-        let rulette_segments = this.rulette_segments.sort( (elemA, elemB) => {
-            return elemA.order - elemB.order
-        })
-        .map( element => {
+        this.rulette_sectors.sort( (elemA, elemB) => elemA.tag - elemB.tag );
+        this.rulette_segments.sort( (elemA, elemB) => elemA.order - elemB.order )
+
+        let rulette_segments = this.rulette_segments.map( element => {
             return {
                 'fillStyle': element.color,
                 'text': element.tag
@@ -28,27 +24,31 @@ class Ruleta {
         this.callback_winner = callback_winner;
         this.dificultad = dificultad;
         this.jugadas = jugadas;
+        this.radius = 180
+
         this.innerWheel = new Winwheel({
             'canvasId': canvasId || 'canvas',
             'numSegments' : rulette_segments.length,
-            'outerRadius' : 180,
+            'outerRadius' : this.radius,
             'textFillStyle': 'white',
             'textAlignment': 'outer',
             // 'textOrientation': 'curved', 
             'segments': rulette_segments,
             // 'drawMode': 'image',
             'animation': {
-              'type': 'spinToStop',                     // Define animation more or less as normal, except for the callbackAfter().
-              'duration': 5,
-              'spins': 8,
-              'callbackAfter' : this.drawInnerWheel.bind( this ),     // Call back after each frame of the animation a function we can draw the inner wheel from.
-              'callbackFinished': this.alertPrize.bind( this )
+                'type': 'spinToStop',                     // Define animation more or less as normal, except for the callbackAfter().
+                'duration': 5,
+                'spins': 8,
+                'callbackAfter' : this.drawWheels.bind( this ),     // Call back after each frame of the animation a function we can draw the inner wheel from.
+                'callbackFinished': this.alertPrize.bind( this )
             }
         });
 
+        console.log(this.rulette_segments)
+
         this.outerWheel = new Winwheel({
             'numSegments'       : 1,                // Specify tag of segments.
-            // 'innerRadius'       : 160,
+            'innerRadius'       : this.radius,
             'outerRadius'       : 180,
             'drawText'          : true,             // Code drawn text can be used with segment images.
             'textFontSize'      : 16,               // Set text options as desired.
@@ -64,23 +64,46 @@ class Ruleta {
             'segments'          : [],
         });
 
+        let image = this.generateImage( );
         let LoadedImg = new Image( );
-        LoadedImg.src = "http://localhost/ruleta/wp-content/plugins/wp_rulette/img/ruleta.png"
-        LoadedImg.onload = _ => {
-            this.outerWheel.wheelImage = LoadedImg;
-            this.outerWheel.draw( );
-            this.innerWheel.draw(false);
+        LoadedImg.src = image.toDataURL( );
+        LoadedImg.onload = _=> {
+            this.outerWheel.wheelImage = image;
+            this.drawWheels( )
         }
 
-        this.innerWheel.draw();
+        this.drawWheels( );
 
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
             this.initSpin( )
         })
     }
 
+    generateImage( ) {
+        let canvas = document.createElement('canvas');
+        let ctx = canvas.getContext('2d');
+        let scale = 4;
+        canvas.width = this.radius*scale;
+        canvas.height = this.radius*scale;
+        let d_angle = (360/this.rulette_segments.length)*Math.PI/180
+        let dx = d_angle*this.radius;
+        
+        this.rulette_sectors.forEach( (element, index) => {
+            let image = document.createElement('img');
+            image.src = element.image_src;
+            image.onload = _ => {
+                ctx.save( )
+                ctx.translate( this.radius*scale/2, this.radius*scale/2 );
+                ctx.rotate( d_angle*(element.order) );
+                ctx.drawImage( image, -dx, -(this.radius+dx ), dx,dx )
+                ctx.translate( -this.radius*scale/2, -this.radius*scale/2 );
+                ctx.restore( )
+            }
+        })
+        return canvas;
+    }
     // This function is called after the outer wheel has drawn during the animation.
-    drawInnerWheel( ) {
+    drawWheels( ) {
         this.outerWheel.rotationAngle = this.innerWheel.rotationAngle;
         this.outerWheel.draw( );
         this.innerWheel.draw(false);
@@ -94,7 +117,7 @@ class Ruleta {
         winner = winningInnerSegment;
 
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( Rulette_sectors[ winner ] );
+        this.callback_winner && this.callback_winner( this.rulette_sectors[ winner ] );
     }
 
     initSpin( ) {
@@ -162,7 +185,6 @@ class Ruleta {
             // figured out by the animation.
             this.innerWheel.rotationAngle = 0;
             this.innerWheel.animation.stopAngle = value;
-            this.innerWheel.draw( );
 
             this.innerWheel.startAnimation( );
             this.wheelSpinning = true;
