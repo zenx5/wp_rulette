@@ -25,22 +25,6 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
-        // add_action('wp_ajax_endpoint', array('WP_Rulette', 'uploadImage'));
-        // add_action('wp_ajax_nopriv_endpoint', array('WP_Rulette', 'uploadImage'));
-    }
-
-    public static function uploadImage( ) {
-    // $name = $_POST['name'];
-    // echo $name;
-    // die( );
-        $cont=0;
-        // ciclo para recorrer el array de imagenes
-        foreach ($_FILES["img_extra"]["name"] as $key => $value) {
-            //Se copian los archivos de la carpeta temporal del servidor a su ubicación final
-            move_uploaded_file($_FILES["img_extra"]["tmp_name"][$key], "img/".$_FILES["img_extra"]["name"][$key]);
-            $cont++;
-        }
-        wp_die( );
     }
 
     public static function get_sectores()
