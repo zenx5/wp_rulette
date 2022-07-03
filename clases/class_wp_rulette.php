@@ -57,9 +57,9 @@ class WP_Rulette extends Plugink
                 'tag' => $metas['wp_rulette_tag'][0],
                 'color' => $metas['wp_rulette_color'][0],
                 'order' => $metas['wp_rulette_order'][0],
-                'image_file' => $metas['wp_rulette_image_file'][0],
-                'image_src' => $metas['wp_rulette_image_src'][0],
-                'image_name' => $metas['wp_rulette_image_name'][0]
+                'image_file' => isset($metas['wp_rulette_image_file']) ? $metas['wp_rulette_image_file'][0] : '',
+                'image_src' => isset($metas['wp_rulette_image_src']) ? $metas['wp_rulette_image_src'][0] : '',
+                'image_name' => isset($metas['wp_rulette_image_name']) ? $metas['wp_rulette_image_file'][0] : ''
             );
             $datas[] = $data;
         };

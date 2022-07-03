@@ -83,8 +83,8 @@ class Ruleta {
         let canvas = document.createElement('canvas');
         let ctx = canvas.getContext('2d');
         let scale = 4;
-        canvas.width = this.radius*scale;
-        canvas.height = this.radius*scale;
+        canvas.width = this.radius*scale*2;
+        canvas.height = this.radius*scale*2;
         let d_angle = (360/this.rulette_segments.length)*Math.PI/180
         let dx = d_angle*this.radius;
         
@@ -93,10 +93,10 @@ class Ruleta {
             image.src = element.image_src;
             image.onload = _ => {
                 ctx.save( )
-                ctx.translate( this.radius*scale/2, this.radius*scale/2 );
-                ctx.rotate( d_angle*(element.order) );
-                ctx.drawImage( image, -dx, -(this.radius+dx ), dx,dx )
-                ctx.translate( -this.radius*scale/2, -this.radius*scale/2 );
+                ctx.translate( this.radius*scale, this.radius*scale );
+                ctx.rotate( d_angle*(+element.order-0.5) );
+                ctx.drawImage( image, -dx/2, -(this.radius+dx ), dx,dx )
+                ctx.translate( -this.radius*scale, -this.radius*scale );
                 ctx.restore( )
             }
         })
