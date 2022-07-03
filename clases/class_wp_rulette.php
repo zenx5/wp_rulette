@@ -212,6 +212,7 @@ class WP_Rulette extends Plugink
             'has_archive'  => false,
             'hierarchical' => false,
             'supports'     => array('title'),
+            'taxonomies' => ['gamepack'],
             //'menu_icon'    => pods_svg_icon('pods'),
             //'menu_position' => 5,
             'show_in_nav_menus' => false,
@@ -232,6 +233,37 @@ class WP_Rulette extends Plugink
             //'menu_position' => 5,
             'show_in_nav_menus' => false,
         ]);
+
+        register_taxonomy(
+            'gamepack',
+            ['rulette_sector'],
+            [
+                'hierarchical'          => false,
+                'labels'                => [
+                    'name'                       => 'Juegos',
+                    'singular_name'              => 'Juego',
+                    'search_items'               => 'Buscar Juegos',
+                    'popular_items'              => 'Juegos Comunes',
+                    'all_items'                  => 'Todos los Juegos',
+                    'parent_item'                => null,
+                    'parent_item_colon'          => null,
+                    'edit_item'                  => 'Editar Juego',
+                    'update_item'                => 'Actualizar Juego',
+                    'add_new_item'               => 'Agregar Nuevo Juego',
+                    'new_item_name'              => 'Nuevo Juego Agregado',
+                    'separate_items_with_commas' => 'Separar Juegos con comas',
+                    'add_or_remove_items'        => 'Agregar o Remover Juegos',
+                    'choose_from_most_used'      => 'Seleccionar Juegos mas usados',
+                    'not_found'                  => 'Juego no encontrado',
+                    'menu_name'                  => 'Juegos'
+                ],
+                'show_ui'               => true,
+                'show_admin_column'     => true,
+                'update_count_callback' => '_update_post_term_count',
+                'query_var'             => true,
+                'rewrite'               => array('slug' => 'gamepack'),
+            ]
+        );
     }
 
     public static function create_metas()
