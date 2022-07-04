@@ -1,9 +1,7 @@
 class Ruleta {
-    constructor({
-        callback_winner,
-        canvasId
-    } = {}) {
-        let rulette_segments = Rulette_sectors
+    constructor({callback_winner,canvasId, sectors} = {}) {
+        
+        let rulette_segments = sectors
         .sort( (elemA, elemB) => {
             return elemA.order - elemB.order
         })
@@ -13,6 +11,7 @@ class Ruleta {
                 'text': element.tag
             }
         });
+        this.sectors = rulette_segments
         this.desfase = -4;
         this.wheelSpinning = false;
         this.callback_winner = callback_winner;
@@ -52,15 +51,6 @@ class Ruleta {
             'segments'          : [],
         });
 
-        let LoadedImg = new Image( );
-        LoadedImg.src = "http://localhost/ruleta/wp-content/plugins/wp_rulette/img/ruleta.png"
-        LoadedImg.onload = _ => {
-            this.outerWheel.wheelImage = LoadedImg;
-            this.outerWheel.draw( );
-            this.innerWheel.rotationAngle += this.desfase;
-            this.innerWheel.draw(false);
-        }
-
         this.innerWheel.draw();
 
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
@@ -68,6 +58,7 @@ class Ruleta {
         })
     }
 
+    
     // This function is called after the outer wheel has drawn during the animation.
     drawInnerWheel( ) {
         this.outerWheel.rotationAngle = this.innerWheel.rotationAngle-this.desfase;
@@ -81,7 +72,7 @@ class Ruleta {
         // var winningOuterSegment = this.outerWheel.getIndicatedSegment();
 
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( Rulette_sectors[ winningInnerSegment -1 ] );
+        this.callback_winner && this.callback_winner( this.sectors[ winningInnerSegment -1 ] );
     }
     // -------------------------------------------------------
     // Click handler for spin button.
@@ -105,10 +96,15 @@ class Ruleta {
     }
 }
 
-addEventListener('load', ev => {
+addEventListener('load', async ev => {
+    const $ = jQuery
+    const pack = $('canvas').data('pack') 
+    const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
+    console.log( sectors )
     new Ruleta({
         callback_winner: data => {
             console.log(data)
-        }
+        },
+        sectors: sectors
     })
 })

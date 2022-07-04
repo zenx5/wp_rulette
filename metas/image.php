@@ -21,7 +21,7 @@ $image_path = WP_Rulette::get_var_meta('wp_rulette_image_path');
 
 <script type="text/javascript">
 	let image = document.querySelector("#wp_rulette_image");
-	let imageName = '<?= $image_name ?>' || 'default.png';
+	let imageName = '<?= $image_name ?>';
 	let dirImages = '<?= str_replace('\\', '/', WP_PLUGIN_DIR); ?>' + '/wp_rulette/img/';
 	let image_file = document.querySelector("#wp_rulette_image_file");
 	let src;
