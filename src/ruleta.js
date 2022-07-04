@@ -51,15 +51,6 @@ class Ruleta {
             'segments'          : [],
         });
 
-        let LoadedImg = new Image( );
-        LoadedImg.src = "http://localhost/ruleta/wp-content/plugins/wp_rulette/img/ruleta.png"
-        LoadedImg.onload = _ => {
-            this.outerWheel.wheelImage = LoadedImg;
-            this.outerWheel.draw( );
-            this.innerWheel.rotationAngle += this.desfase;
-            this.innerWheel.draw(false);
-        }
-
         this.innerWheel.draw();
 
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
