@@ -44,7 +44,7 @@ class Ruleta {
             }
         });
 
-        console.log(this.rulette_segments)
+        
 
         this.outerWheel = new Winwheel({
             'numSegments'       : 1,                // Specify tag of segments.
@@ -113,7 +113,6 @@ class Ruleta {
     alertPrize( ) {
         var winningInnerSegment = +this.innerWheel.getIndicatedSegment().text;
         let winner;
-        console.log(winningInnerSegment)
         winner = winningInnerSegment;
 
         this.wheelSpinning = false;
@@ -131,7 +130,7 @@ class Ruleta {
                 
             case 'hard':
                 array_temp = [ ...this.jugadas, ...this.rulette_sectors ];
-                console.log(array_temp)
+                
                 let array_arrays = [];
                 while( array_temp.length ) {
                     let arr = [];
@@ -147,7 +146,7 @@ class Ruleta {
                 array_arrays.sort( (elemA, elemB ) => {
                     return elemA.length - elemB.length
                 })
-                console.log(array_arrays)
+                
                 index = array_arrays[0][0].tag;
                 break;
 
@@ -156,9 +155,9 @@ class Ruleta {
                 let level = this.levels[ level_index ];
                 for( let i=0; i<level.restart; i++ ) {
                     index = GetRandomInteger( 0, this.rulette_sectors.length-1 );
-                    console.log(index)
+                    
                     if( this.jugadas.findIndex( element => element.tag == index ) == -1 ) {
-                        console.log("break")
+                        
                         break;
                     }
                 }
@@ -224,7 +223,7 @@ addEventListener('load', ev => {
     jugadas.suffle( )
     new Ruleta({
         callback_winner: function( data ) {
-            console.log(data)
+            
         },
         jugadas: jugadas,
         levels: Rulette_levels,
