@@ -97,8 +97,7 @@ class Ruleta {
 }
 
 addEventListener('load', async ev => {
-    const $ = jQuery
-    const pack = $('canvas').data('pack') 
+    const pack = document.querySelector('canvas').dataset.pack
     const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
     console.log( sectors )
     new Ruleta({
