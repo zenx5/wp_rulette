@@ -109,7 +109,6 @@ class WP_Rulette extends Plugink
         <script type="text/javascript">
             var Rulette_sectors = <?= json_encode(self::get_sectores()); ?>;
             var Rulette_levels = <?= json_encode(self::get_level()); ?>;
-            console.log(Rulette_levels)
         </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
@@ -281,7 +280,7 @@ class WP_Rulette extends Plugink
                 'show_admin_column'     => true,
                 'update_count_callback' => '_update_post_term_count',
                 'query_var'             => true,
-                'rewrite'               => array('slug' => 'gamepack'),
+                'rewrite'               => array('slug' => 'gamepack')
             ]
         );
     }

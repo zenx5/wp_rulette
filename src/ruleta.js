@@ -4,7 +4,8 @@ class Ruleta {
         canvasId,
         jugadas,
         dificultad,
-        levels
+        levels,
+        audio
     } = {}) {
         this.rulette_sectors = Rulette_sectors.map( elem => elem );
         this.rulette_segments = Rulette_sectors.map( elem => elem );
@@ -24,12 +25,14 @@ class Ruleta {
         this.callback_winner = callback_winner;
         this.dificultad = dificultad;
         this.jugadas = jugadas;
-        this.radius = 180
+        this.radius = 180;
+        this.audio = audio;
 
         this.innerWheel = new Winwheel({
             'canvasId': canvasId || 'canvas',
             'numSegments' : rulette_segments.length,
             'outerRadius' : this.radius,
+            'innerRadius' : this.radius/2,
             'textFillStyle': 'white',
             'textAlignment': 'outer',
             // 'textOrientation': 'curved', 
@@ -41,15 +44,27 @@ class Ruleta {
                 'spins': 8,
                 'callbackAfter' : this.drawWheels.bind( this ),     // Call back after each frame of the animation a function we can draw the inner wheel from.
                 'callbackFinished': this.alertPrize.bind( this )
+            },
+            'pins': {
+                'number'     : 24,
+                'fillStyle'  : 'silver',
             }
         });
 
-        console.log(this.rulette_segments)
+        this.ss = new Winwheel({
+            canvasId: canvasId || 'canvas',
+            numSegments: 1,
+            innerRadius: this.radius/2-8,
+            outerRadius: this.radius+5,
+            fillStyle: 'yellow',
+            segments: []
+        })
 
         this.outerWheel = new Winwheel({
+            'canvasId': canvasId || 'canvas',
             'numSegments'       : 1,                // Specify tag of segments.
-            'innerRadius'       : this.radius,
-            'outerRadius'       : 180,
+            'innerRadius'       : 0,
+            'outerRadius'       : this.radius,
             'drawText'          : true,             // Code drawn text can be used with segment images.
             'textFontSize'      : 16,               // Set text options as desired.
             'fillStyle'         : 'white',
@@ -72,11 +87,15 @@ class Ruleta {
             this.drawWheels( )
         }
 
-        this.drawWheels( );
-
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
             this.initSpin( )
         })
+    }
+    
+    playSound( ) {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+        this.audio.play();
     }
 
     generateImage( ) {
@@ -95,7 +114,7 @@ class Ruleta {
                 ctx.save( )
                 ctx.translate( this.radius*scale, this.radius*scale );
                 ctx.rotate( d_angle*(+element.order-0.5) );
-                ctx.drawImage( image, -dx/2, -(this.radius+dx ), dx,dx )
+                ctx.drawImage( image, -dx/2, -(this.radius+dx+10 ), dx,dx )
                 ctx.translate( -this.radius*scale, -this.radius*scale );
                 ctx.restore( )
             }
@@ -105,7 +124,8 @@ class Ruleta {
     // This function is called after the outer wheel has drawn during the animation.
     drawWheels( ) {
         this.outerWheel.rotationAngle = this.innerWheel.rotationAngle;
-        this.outerWheel.draw( );
+        this.ss.draw( );
+        this.outerWheel.draw(false);
         this.innerWheel.draw(false);
     }
 
@@ -113,7 +133,6 @@ class Ruleta {
     alertPrize( ) {
         var winningInnerSegment = +this.innerWheel.getIndicatedSegment().text;
         let winner;
-        console.log(winningInnerSegment)
         winner = winningInnerSegment;
 
         this.wheelSpinning = false;
@@ -131,7 +150,7 @@ class Ruleta {
                 
             case 'hard':
                 array_temp = [ ...this.jugadas, ...this.rulette_sectors ];
-                console.log(array_temp)
+                
                 let array_arrays = [];
                 while( array_temp.length ) {
                     let arr = [];
@@ -147,7 +166,7 @@ class Ruleta {
                 array_arrays.sort( (elemA, elemB ) => {
                     return elemA.length - elemB.length
                 })
-                console.log(array_arrays)
+                
                 index = array_arrays[0][0].tag;
                 break;
 
@@ -156,9 +175,9 @@ class Ruleta {
                 let level = this.levels[ level_index ];
                 for( let i=0; i<level.restart; i++ ) {
                     index = GetRandomInteger( 0, this.rulette_sectors.length-1 );
-                    console.log(index)
+                    
                     if( this.jugadas.findIndex( element => element.tag == index ) == -1 ) {
-                        console.log("break")
+                        
                         break;
                     }
                 }
@@ -228,6 +247,6 @@ addEventListener('load', ev => {
         },
         jugadas: jugadas,
         levels: Rulette_levels,
-        dificultad: 'medium'  //ease, medium, hard
+        dificultad: 'ease'  //ease, medium, hard
     })
 })
