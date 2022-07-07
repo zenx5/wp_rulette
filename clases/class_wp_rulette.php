@@ -22,34 +22,53 @@ class WP_Rulette extends Plugink
         add_action('save_post', array('WP_Rulette', 'save_post'));
         add_action('publish_post', array('WP_Rulette', 'save_post'));
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
+        add_action('rest_api_init', array('WP_Rulette', 'api_rulette'));
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
     }
 
-    public static function get_sectores()
+    public static function api_rulette()
+    {
+        register_rest_route("rulette/v1", 'sectors', array(
+            'methods' => 'get',
+            'callback' => ['WP_Rulette', 'get_sectores']
+        ));
+    }
+
+    public static function get_sectores($arg)
     {
         $datas = array();
         $query = new WP_Query(array(
             'post_type' => 'rulette_sector',
-            'posts_per_page' => -1
+            'posts_per_page' => -1,
+            'taxonomies' => 'pack'
         ));
+
+
+        $pack = isset($_GET['pack']) ? $_GET['pack'] : $arg;
+
         foreach ($query->posts as $post) {
-            $metas = get_post_meta($post->ID);
-            $data = array(
-                'name' => $post->post_title,
-                'tag' => $metas['wp_rulette_tag'][0],
-                'color' => $metas['wp_rulette_color'][0],
-                'order' => $metas['wp_rulette_order'][0],
-                'image_file' => isset($metas['wp_rulette_image_file']) ? $metas['wp_rulette_image_file'][0] : '',
-                'image_src' => isset($metas['wp_rulette_image_src']) ? $metas['wp_rulette_image_src'][0] : '',
-                'image_name' => isset($metas['wp_rulette_image_name']) ? $metas['wp_rulette_image_file'][0] : ''
-            );
-            $datas[] = $data;
+            $taxonomies = wp_get_post_terms($post->ID, 'gamepack', ['fields' => 'names']);
+            if (in_array($pack, $taxonomies)) {
+                $metas = get_post_meta($post->ID);
+                $data = array(
+                    'name' => $post->post_title,
+                    'tag' => $metas['wp_rulette_tag'][0],
+                    'color' => $metas['wp_rulette_color'][0],
+                    'order' => $metas['wp_rulette_order'][0],
+                    'image_file' => $metas['wp_rulette_image_file'][0],
+                    'image_src' => $metas['wp_rulette_image_src'][0],
+                    'image_name' => $metas['wp_rulette_image_name'][0],
+                    'pack' => $pack
+                );
+                $datas[] = $data;
+            }
         };
         return $datas;
     }
 
+    
     public static function get_level( ) {
         $datas = array( );
         $query = new WP_Query( array(
@@ -63,7 +82,7 @@ class WP_Rulette extends Plugink
                 'restart' => $metas['wp_rulette_restart'][0]
             );
             $datas[] = $data;
-        };
+        }
         return $datas;
     }
 
@@ -107,8 +126,8 @@ class WP_Rulette extends Plugink
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
         <script type="text/javascript">
-            var Rulette_sectors = <?= json_encode(self::get_sectores()); ?>;
-            var Rulette_levels = <?= json_encode(self::get_level()); ?>;
+            // var Rulette_sectors = <?= json_encode(self::get_sectores('ilumination')); ?>;
+            // console.log(Rulette_sectors)
         </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
@@ -116,8 +135,10 @@ class WP_Rulette extends Plugink
     <?php
     }
 
-    public static function render_rulette()
+    public static function render_rulette($attrs)
     {
+        if (!isset($attrs['pack'])) return;
+        $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
         ob_start();
     ?>
         <table cellpadding="0" cellspacing="0" border="0">
@@ -129,7 +150,7 @@ class WP_Rulette extends Plugink
                     </div>
                 </td>
                 <td width="438" height="582" class="the_wheel" style="text-align:center" valign="center">
-                    <canvas id="canvas" width="434" height="434">
+                    <canvas id="canvas" width="434" height="434" data-pack="<?= $packname ?>">
                         <p style="color: white; text-align:center">Sorry, your browser doesn't support canvas. Please try another.</p>
                     </canvas>
                 </td>
@@ -141,9 +162,10 @@ class WP_Rulette extends Plugink
         return $html;
     }
 
-    public static function board()
+    public static function board($attrs)
     {
-        $sectores = self::get_sectores();
+        if (!isset($attrs['pack'])) return;
+        $sectores = self::get_sectores($attrs['pack']);
         $byRow = 3;
         $columnCount = 0;
         $width = 100 / $byRow;
@@ -259,22 +281,22 @@ class WP_Rulette extends Plugink
             [
                 'hierarchical'          => false,
                 'labels'                => [
-                    'name'                       => 'Juegos',
-                    'singular_name'              => 'Juego',
-                    'search_items'               => 'Buscar Juegos',
-                    'popular_items'              => 'Juegos Comunes',
-                    'all_items'                  => 'Todos los Juegos',
+                    'name'                       => 'Packs',
+                    'singular_name'              => 'Pack',
+                    'search_items'               => 'Buscar Packs',
+                    'popular_items'              => 'Packs Comunes',
+                    'all_items'                  => 'Todos los Packs',
                     'parent_item'                => null,
                     'parent_item_colon'          => null,
-                    'edit_item'                  => 'Editar Juego',
-                    'update_item'                => 'Actualizar Juego',
-                    'add_new_item'               => 'Agregar Nuevo Juego',
-                    'new_item_name'              => 'Nuevo Juego Agregado',
-                    'separate_items_with_commas' => 'Separar Juegos con comas',
-                    'add_or_remove_items'        => 'Agregar o Remover Juegos',
-                    'choose_from_most_used'      => 'Seleccionar Juegos mas usados',
-                    'not_found'                  => 'Juego no encontrado',
-                    'menu_name'                  => 'Juegos'
+                    'edit_item'                  => 'Editar Pack',
+                    'update_item'                => 'Actualizar Pack',
+                    'add_new_item'               => 'Agregar Nuevo Pack',
+                    'new_item_name'              => 'Nuevo Pack Agregado',
+                    'separate_items_with_commas' => 'Separar Packs con comas',
+                    'add_or_remove_items'        => 'Agregar o Remover Packs',
+                    'choose_from_most_used'      => 'Seleccionar Packs mas usados',
+                    'not_found'                  => 'Pack no encontrado',
+                    'menu_name'                  => 'Packs'
                 ],
                 'show_ui'               => true,
                 'show_admin_column'     => true,

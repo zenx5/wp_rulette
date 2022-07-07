@@ -5,10 +5,11 @@ class Ruleta {
         jugadas,
         dificultad,
         levels,
+        sectors,
         audio
     } = {}) {
-        this.rulette_sectors = Rulette_sectors.map( elem => elem );
-        this.rulette_segments = Rulette_sectors.map( elem => elem );
+        this.rulette_sectors = sectors || []
+        this.rulette_segments = sectors.map( elem => elem );
 
         this.rulette_sectors.sort( (elemA, elemB) => elemA.tag - elemB.tag );
         this.rulette_segments.sort( (elemA, elemB) => elemA.order - elemB.order )
@@ -20,11 +21,11 @@ class Ruleta {
             }
         });
 
-        this.levels = levels;
+        this.levels = levels || [];
         this.wheelSpinning = false;
         this.callback_winner = callback_winner;
-        this.dificultad = dificultad;
-        this.jugadas = jugadas;
+        this.dificultad = dificultad || "easy";
+        this.jugadas = jugadas || [];
         this.radius = 180;
         this.audio = audio;
 
@@ -80,11 +81,14 @@ class Ruleta {
         });
 
         let image = this.generateImage( );
-        let LoadedImg = new Image( );
-        LoadedImg.src = image.toDataURL( );
-        LoadedImg.onload = _=> {
+        let loadImage = new Image( )
+        loadImage.src = image.toDataURL( )
+        console.log(image)
+        console.log(loadImage.src)
+        loadImage.onload = _ => {
             this.outerWheel.wheelImage = image;
             this.drawWheels( )
+
         }
 
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
@@ -144,8 +148,8 @@ class Ruleta {
         let array_temp;
         let value;
         switch( this.dificultad ) {
-            case 'ease':
-                index = null;
+            case 'easy':
+                index = GetRandomInteger( 0, this.rulette_sectors.length );
                 break;
                 
             case 'hard':
@@ -211,42 +215,23 @@ class Ruleta {
     }
 }
 
+function getRandomNumber( min, max ) {
+    return Math.random( )*( max - min) + min;
+}
+
 function GetRandomInteger( min, max ) {
-	return Math.round( Math.random( )*( max - min ) + min );
-}
-function getRandomNumber( min , max , numDecimales=15 ) {
-    return Math.random( )*( max - min ) + min;
+    return Math.floor( getRandomNumber( min, max+1 ) );
 }
 
-addEventListener('load', ev => {
-    Array.prototype.suffle = function ( ) {
-        let ArrayTemp = this.map( element => element );
-        for( let max = this.length-1 , i = 0 ; max >= 0 ; max-- , i++ ) {
-            let Random = GetRandomInteger( 0 , max );
-            this[i] = ArrayTemp[ Random ];
-            ArrayTemp[ Random ] = ArrayTemp[ max ];
-        };
-        return this;
-    };
-
-    let jugadas = [];
-    Rulette_sectors.sort( (elemA, elemB) => {
-        return elemA.tag - elemB.tag
-    });
-    ///////////////////Aqui se crea un array con jugadas e pruebas//////////////////////////
-    for( let i=0; i<Rulette_sectors.length; i++ ) {
-        for( let f=0; f<=i; f++ ) {
-            jugadas.push( Rulette_sectors[i] )
-        }
-    }
-    //////////////////////////////////////////////////////////////////////////////////
-    jugadas.suffle( )
+addEventListener('load', async ev => {
+    const pack = document.querySelector('canvas').dataset.pack
+    console.log( pack )
+    const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
+    console.log( sectors )
     new Ruleta({
-        callback_winner: function( data ) {
+        callback_winner: data => {
             console.log(data)
         },
-        jugadas: jugadas,
-        levels: Rulette_levels,
-        dificultad: 'ease'  //ease, medium, hard
+        sectors: sectors
     })
 })
