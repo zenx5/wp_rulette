@@ -68,11 +68,8 @@ class Ruleta {
 
     // Called when the animation has finished.
     alertPrize( ) {
-        var winningInnerSegment = +this.innerWheel.getIndicatedSegment().text;
-        // var winningOuterSegment = this.outerWheel.getIndicatedSegment();
-
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( this.sectors[ winningInnerSegment -1 ] );
+        this.callback_winner && this.callback_winner( this.sectors, this.innerWheel.getIndicatedSegment() );
     }
     // -------------------------------------------------------
     // Click handler for spin button.
@@ -101,8 +98,8 @@ addEventListener('load', async ev => {
     const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
     console.log( sectors )
     new Ruleta({
-        callback_winner: data => {
-            console.log(data)
+        callback_winner: (sectors, segment) => {
+            console.log(sectors, segment)
         },
         sectors: sectors
     })
