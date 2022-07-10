@@ -225,7 +225,7 @@ class WP_Rulette extends Plugink
         self::create_type_post('rulette_sector', 'sector de la ruleta', 'sectores de la ruleta', [
             'description' => 'Define los diferentes sectores de la ruleta',
             'public'       => false,
-            'can_export'   => false,
+            'can_export'   => true,
             'show_ui'      => true,
             'show_in_menu' => true,
             'query_var'    => false,
@@ -242,7 +242,7 @@ class WP_Rulette extends Plugink
         self::create_type_post('rulette_level', 'Nivel de la ruleta', 'Niveles de la ruleta', [
             'description' => 'Define los diferentes niveles de dificulta de la ruleta',
             'public'       => false,
-            'can_export'   => false,
+            'can_export'   => true,
             'show_ui'      => true,
             'show_in_menu' => true,
             'query_var'    => false,
