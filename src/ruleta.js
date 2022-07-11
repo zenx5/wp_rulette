@@ -223,14 +223,14 @@ function GetRandomInteger( min, max ) {
 addEventListener('load', async ev => {
     const pack = document.querySelector('canvas').dataset.pack
     console.log( pack )
-    const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
+    const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
     console.log( sectors )
     console.log(`${location.origin}/ruleta/wp-json/rulette/v1/plays`)
     new Ruleta({
         callback_winner: data => {
             console.log(data);
             $.ajax({
-                url: `${location.origin}/ruleta/wp-json/rulette/v1/plays`,
+                url: `${location.origin}/wp-json/rulette/v1/plays`,
                 type: 'post',
                 data: {
                     play: data
