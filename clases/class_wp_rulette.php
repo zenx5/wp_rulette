@@ -17,6 +17,7 @@ class WP_Rulette extends Plugink
     public static function init()
     {
         self::create_types();
+        // add_action('wp_enqueue_scripts', array('WP_Rulette', 'rulette_insertar_js'));
         add_action('add_meta_boxes_rulette_sector', array('WP_Rulette', 'create_metas'));
         add_action('add_meta_boxes_rulette_level', array('WP_Rulette', 'create_metas'));
         add_action('save_post', array('WP_Rulette', 'save_post'));
@@ -26,6 +27,53 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_action('wp_ajax_save_play','save_play_in_history');
+        add_action('wp_ajax_nopriv_save_play','save_play_in_history');
+    }
+
+    // public static function rulette_insertar_js( ){
+    //     if (!is_home()) return;
+
+    //     wp_register_script('rulete_script', WP_PLUGIN_DIR.'wp_rulette/src/ruleta.js', array('jquery'), '1', true );
+    //     wp_enqueue_script('rulete_script');
+
+    //     wp_localize_script('rulete_script','rulette_var',array('ajaxurl'=>admin_url('admin-ajax.php')));
+    // }
+
+
+    public static function save_play_in_history( ) {
+        $play = $_POST['play'];
+        $my_post = array(
+          'post_title'    => wp_strip_all_tags( $play['name'] ),
+          'post_content'  => $play['tag'],
+          'post_status'   => 'publish',
+          'post_type'   => "historial"
+        );
+        return wp_insert_post( $my_post );
+        return $_POST;
+    }
+
+    public static function get_play_history( ) {
+        $datas = array( );
+        $query = new WP_Query(array(
+            'post_type' => 'historial',
+            'posts_per_page' => -1
+        ));
+        $rulette_sectors = self::get_sectores( $_GET['pack'] );
+
+        foreach( $query->posts as $post ) {
+            $play;
+            foreach( $rulette_sectors as $element ) {
+                if( $element['tag'] === '35' ) {
+                    $play = $element;
+                    break;
+                }
+            };
+            $post->jugada = $play; 
+            $datas[] = $post;
+        
+        };
+        return $datas;
     }
 
     public static function api_rulette()
@@ -33,6 +81,14 @@ class WP_Rulette extends Plugink
         register_rest_route("rulette/v1", 'sectors', array(
             'methods' => 'get',
             'callback' => ['WP_Rulette', 'get_sectores']
+        ));
+        register_rest_route("rulette/v1", 'plays', array(
+            'methods' => 'post',
+            'callback' => ['WP_Rulette', 'save_play_in_history']
+        ));
+        register_rest_route('rulette/v1', 'plays', array(
+            'methods' => 'get',
+            'callback' => ['WP_Rulette', 'get_play_history']
         ));
     }
 
@@ -132,6 +188,10 @@ class WP_Rulette extends Plugink
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>
+        <script
+          src="https://code.jquery.com/jquery-3.6.0.min.js"
+          integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+          crossorigin="anonymous"></script>
     <?php
     }
 
@@ -261,6 +321,22 @@ class WP_Rulette extends Plugink
 
         self::create_type_post('rulette_level', 'Nivel de la ruleta', 'Niveles de la ruleta', [
             'description' => 'Define los diferentes niveles de dificulta de la ruleta',
+            'public'       => false,
+            'can_export'   => false,
+            'show_ui'      => true,
+            'show_in_menu' => true,
+            'query_var'    => false,
+            'rewrite'      => false,
+            'has_archive'  => false,
+            'hierarchical' => false,
+            'supports'     => array('title'),
+            //'menu_icon'    => pods_svg_icon('pods'),
+            //'menu_position' => 5,
+            'show_in_nav_menus' => false,
+        ]);
+
+        self::create_type_post('historial', 'Historial de la ruleta', 'Historial de la ruleta', [
+            'description' => 'Guarda las diferentes jugadas que s han realizado',
             'public'       => false,
             'can_export'   => false,
             'show_ui'      => true,

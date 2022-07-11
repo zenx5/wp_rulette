@@ -83,8 +83,6 @@ class Ruleta {
         let image = this.generateImage( );
         let loadImage = new Image( )
         loadImage.src = image.toDataURL( )
-        console.log(image)
-        console.log(loadImage.src)
         loadImage.onload = _ => {
             this.outerWheel.wheelImage = image;
             this.drawWheels( )
@@ -135,9 +133,8 @@ class Ruleta {
 
     // Called when the animation has finished.
     alertPrize( ) {
-        var winningInnerSegment = +this.innerWheel.getIndicatedSegment().text;
-        let winner;
-        winner = winningInnerSegment;
+        var winningInnerSegment = this.innerWheel.getIndicatedSegment().text;
+        let winner = this.rulette_sectors.findIndex( element => element.tag === winningInnerSegment )
 
         this.wheelSpinning = false;
         this.callback_winner && this.callback_winner( this.rulette_sectors[ winner ] );
@@ -228,9 +225,23 @@ addEventListener('load', async ev => {
     console.log( pack )
     const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
     console.log( sectors )
+    console.log(`${location.origin}/ruleta/wp-json/rulette/v1/plays`)
     new Ruleta({
         callback_winner: data => {
-            console.log(data)
+            console.log(data);
+            $.ajax({
+                url: `${location.origin}/ruleta/wp-json/rulette/v1/plays`,
+                type: 'post',
+                data: {
+                    play: data
+                },
+                success: _ => {
+                    console.log(_)
+                },
+                error: _ => {
+                    console.log(_)
+                }
+            })
         },
         sectors: sectors
     })
