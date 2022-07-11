@@ -137,7 +137,7 @@ class Ruleta {
         let winner = this.rulette_sectors.findIndex( element => element.tag === winningInnerSegment )
 
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( this.rulette_sectors[ winner ] );
+        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
     }
 
     initSpin( ) {
