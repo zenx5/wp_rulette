@@ -32,7 +32,7 @@ class WP_Rulette extends Plugink
     public static function save_play_in_history( ) {
         $play = $_POST['play'];
         $query = new WP_Query( array(
-            'post_type' => 'historial',
+            'post_type' => 'rulette_historial',
             'post_per_page' => -1
         ));
         $post_play = false;
@@ -54,7 +54,7 @@ class WP_Rulette extends Plugink
                 'post_title' => wp_strip_all_tags( $play['pack'] ),
                 'post_content' => json_encode($datas),
                 'post_status' => 'publish',
-                'post_type' => "historial"
+                'post_type' => "rulette_historial"
             );
             return wp_insert_post( $my_post );
         }
@@ -63,7 +63,7 @@ class WP_Rulette extends Plugink
                 'post_title' => wp_strip_all_tags( $play['pack'] ),
                 'post_content' => json_encode( array( $data ) ),
                 'post_status' => 'publish',
-                'post_type' => "historial"
+                'post_type' => "rulette_historial"
             );
             return wp_insert_post( $my_post );
         }
@@ -73,7 +73,7 @@ class WP_Rulette extends Plugink
     public static function get_play_history( ) {
         $datas = array( );
         $query = new WP_Query(array(
-            'post_type' => 'historial',
+            'post_type' => 'rulette_historial',
             'posts_per_page' => -1
         ));
         $rulette_sectors = self::get_sectores( $_GET['pack'] );
@@ -381,7 +381,7 @@ class WP_Rulette extends Plugink
             'show_in_nav_menus' => false,
         ]);
 
-        self::create_type_post('historial', 'Historial de la ruleta', 'Historial de la ruleta', [
+        self::create_type_post('rulette_historial', 'Historial de la ruleta', 'Historial de la ruleta', [
             'description' => 'Guarda las diferentes jugadas que s han realizado',
             'public'       => false,
             'can_export'   => false,
