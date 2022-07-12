@@ -205,10 +205,6 @@ class WP_Rulette extends Plugink
             }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
-        <script type="text/javascript">
-            // var Rulette_sectors = <?= json_encode(self::get_sectores('ilumination')); ?>;
-            // console.log(Rulette_sectors)
-        </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>
@@ -250,9 +246,32 @@ class WP_Rulette extends Plugink
     {
         if (!isset($attrs['pack'])) return;
         $sectores = self::get_sectores($attrs['pack']);
+        $order = isset( $attrs['order'] )?$attrs['order']:null;
+        $modo = isset( $attrs['modo'] )?$attrs['modo']:'asc';
+
+        $max = count( $sectores );
+        $aux = [];        
+        if( $order != null ){
+            for( $i = 0; $i < $max-1; $i++ ) {
+                for( $j = 0; $j < $max-1; $j++ ) {
+                    if( $modo == 'asc' ){
+                        $bool = $sectores[$j][$order] > $sectores[$j+1][ $order ];                    
+                    }else{
+                        $bool = $sectores[$j][$order] < $sectores[$j+1][ $order ];
+                    }   
+                    if( $bool ) {
+                        $aux = $sectores[$j];
+                        $sectores[$j] = $sectores[$j+1];
+                        $sectores[$j+1] = $aux;
+                   }             
+                }
+            }
+        }
+        
         $byRow = 3;
         $columnCount = 0;
         $width = 100 / $byRow;
+        ob_start();
     ?>
         <div class="board-container">
             <div class="board-content">
@@ -305,6 +324,9 @@ class WP_Rulette extends Plugink
             })();
         </script>
 <?php
+    $html = ob_get_contents();
+    ob_end_clean();
+    return $html;    
     }
 
     public static function save_post($post_id, $post = null)
