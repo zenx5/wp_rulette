@@ -52,6 +52,8 @@ class Ruleta {
                 'spins': this.duration*1.5,
                 'callbackAfter' : this.drawWheels.bind( this ),
                 'callbackFinished': this.alertWinner.bind( this ),
+                'callbackSound': this.playSound.bind( this ),
+                'soundTrigger': 'pin'
             },
             'pins': {
                 'number'     : this.rulette_sectors.length,
@@ -99,11 +101,12 @@ class Ruleta {
             this.initSpin( )
         })
     }
-    
+
     playSound( ) {
-        this.audio.pause();
-        this.audio.currentTime = 0;
-        this.audio.play();
+        if( !this.audio ) return;
+        this.audio.pause( );
+        this.audio.currentTime = 0.5;
+        this.audio.play( );
     }
 
     generateImage( ) {
@@ -225,7 +228,8 @@ function GetRandomInteger( min, max ) {
 
 addEventListener('load', async ev => {
     const pack = document.querySelector('canvas').dataset.pack
-    const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
+    const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
+    const sound = new Audio(`${location.origin}/ruleta/wp-content/plugins/wp_rulette/audio.mp3`)
     new Ruleta({
         callback_winner: ( sectors, data ) => {
             let winnerIndex = sectors.findIndex( element => element.tag === data.text );
@@ -249,6 +253,7 @@ addEventListener('load', async ev => {
         radius: 180,
         innerRadius: 90,
         backRadius: 185,
-        backColor: 'yellow'
+        backColor: 'yellow',
+        audio: sound,
     })
 })
