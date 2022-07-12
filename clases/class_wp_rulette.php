@@ -27,30 +27,47 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
-        add_action('wp_ajax_save_play','save_play_in_history');
-        add_action('wp_ajax_nopriv_save_play','save_play_in_history');
     }
-
-    // public static function rulette_insertar_js( ){
-    //     if (!is_home()) return;
-
-    //     wp_register_script('rulete_script', WP_PLUGIN_DIR.'wp_rulette/src/ruleta.js', array('jquery'), '1', true );
-    //     wp_enqueue_script('rulete_script');
-
-    //     wp_localize_script('rulete_script','rulette_var',array('ajaxurl'=>admin_url('admin-ajax.php')));
-    // }
-
 
     public static function save_play_in_history( ) {
         $play = $_POST['play'];
-        $my_post = array(
-          'post_title'    => wp_strip_all_tags( $play['name'] ),
-          'post_content'  => $play['tag'],
-          'post_status'   => 'publish',
-          'post_type'   => "historial"
+        $query = new WP_Query( array(
+            'post_type' => 'historial',
+            'post_per_page' => -1
+        ));
+        $post_play = false;
+        foreach( $query->posts as $post ) {
+            if( $post->post_name == $play['pack'] ) {
+                $post_play = $post;
+            }
+        };
+
+        $data = array(
+            'tag' => $play['tag'],
+            'color' => $play['color']
         );
-        return wp_insert_post( $my_post );
-        return $_POST;
+        if( $post_play !== false ) {
+            $datas = json_decode($post_play->post_content);
+            $datas[] = $data;
+            $my_post = array(
+                'ID' => $post_play->ID,
+                'post_title' => wp_strip_all_tags( $play['pack'] ),
+                'post_content' => json_encode($datas),
+                'post_status' => 'publish',
+                'post_type' => "historial"
+            );
+            return wp_insert_post( $my_post );
+        }
+        else {
+            $my_post = array(
+                'post_title' => wp_strip_all_tags( $play['pack'] ),
+                'post_content' => json_encode( array( $data ) ),
+                'post_status' => 'publish',
+                'post_type' => "historial"
+            );
+            return wp_insert_post( $my_post );
+        }
+
     }
 
     public static function get_play_history( ) {
@@ -60,6 +77,13 @@ class WP_Rulette extends Plugink
             'posts_per_page' => -1
         ));
         $rulette_sectors = self::get_sectores( $_GET['pack'] );
+
+        foreach( $query->posts as $post ) {
+            if( $post->post_name == $_GET['pack'] ) {
+                $datas = json_decode($post->post_content);
+            }
+        }
+        return $datas;
 
         foreach( $query->posts as $post ) {
             $play;
