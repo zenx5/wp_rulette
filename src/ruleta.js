@@ -228,15 +228,15 @@ function GetRandomInteger( min, max ) {
 
 addEventListener('load', async ev => {
     const pack = document.querySelector('canvas').dataset.pack
-    const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
-    const sound = new Audio(`${location.origin}/wp-content/plugins/wp_rulette/audio.mp3`)
+    const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
+    const sound = new Audio(`${location.origin}/ruleta/wp-content/plugins/wp_rulette/audio.mp3`)
     new Ruleta({
         callback_winner: ( sectors, data ) => {
             let winnerIndex = sectors.findIndex( element => element.tag === data.text );
             let winner = sectors[ winnerIndex ];
 
             $.ajax({
-                url: `${location.origin}/wp-json/rulette/v1/plays`,
+                url: `${location.origin}/ruleta/wp-json/rulette/v1/plays`,
                 type: 'post',
                 data: {
                     play: winner
