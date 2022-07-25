@@ -2,7 +2,6 @@ class Ruleta {
     constructor({
         callback_winner,
         canvasId,
-        jugadas,
         dificultad,
         levels,
         sectors,
@@ -15,7 +14,6 @@ class Ruleta {
     } = {}) {
 
         this.callback_winner = callback_winner;
-        this.jugadas = jugadas || [];
         this.dificultad = dificultad || "easy";
         this.levels = levels || [];
         this.rulette_sectors = sectors || []
@@ -26,6 +24,8 @@ class Ruleta {
         this.backRadius = backRadius || this.radius;
         this.duration = duration || 5;
 
+        this.plays = [];
+        this.previusPlays = [];
         this.wheelSpinning = false;
 
         this.rulette_sectors.sort( (elemA, elemB) => elemA.order - elemB.order );
@@ -102,6 +102,10 @@ class Ruleta {
         })
     }
 
+    addPlay( play ) {
+        this.plays.push( play );
+    }
+
     playSound( ) {
         if( !this.audio ) return;
         this.audio.pause( );
@@ -143,7 +147,7 @@ class Ruleta {
     // Called when the animation has finished.
     alertWinner( ) {
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
+        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment(), this.plays );
     }
 
     initSpin( ) {
@@ -156,7 +160,7 @@ class Ruleta {
                 break;
                 
             case 'hard':
-                array_temp = [ ...this.jugadas, ...this.rulette_sectors ];
+                array_temp = [ ...this.plays, ...this.rulette_sectors ];
                 
                 let array_arrays = [];
                 while( array_temp.length ) {
@@ -183,8 +187,7 @@ class Ruleta {
                 for( let i=0; i<level.restart; i++ ) {
                     index = GetRandomInteger( 0, this.rulette_sectors.length-1 );
                     
-                    if( this.jugadas.findIndex( element => element.tag == index ) == -1 ) {
-                        
+                    if( this.plays.findIndex( element => element.tag == index ) == -1 ) {
                         break;
                     }
                 }
@@ -231,15 +234,20 @@ addEventListener('load', async ev => {
     const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
     const sound = new Audio(`${location.origin}/ruleta/wp-content/plugins/wp_rulette/audio.mp3`)
     new Ruleta({
-        callback_winner: ( sectors, data ) => {
+        callback_winner: ( sectors, data, plays ) => {
             let winnerIndex = sectors.findIndex( element => element.tag === data.text );
             let winner = sectors[ winnerIndex ];
-
+            let datas = {
+                winner: winner,
+                plays: plays,
+                date: new Date( )
+            };
+            // return console.log(datas);
             $.ajax({
                 url: `${location.origin}/ruleta/wp-json/rulette/v1/plays`,
                 type: 'post',
                 data: {
-                    play: winner
+                    data: datas
                 },
                 success: _ => {
                     console.log(_)

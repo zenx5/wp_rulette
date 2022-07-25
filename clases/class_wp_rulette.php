@@ -27,45 +27,32 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
-        add_action( 'phpmailer_init', array('WP_Rulette', 'configuracion_smtp') );
-    }
-    public static function configuracion_smtp( $phpmailer ){
-        $phpmailer->isSMTP(); 
-        $phpmailer->Host = 'mailmoise.com';
-        $phpmailer->SMTPAuth = true;
-        $phpmailer->Port = 25;
-        $mailer->SMTPDebug = 2;
-        $mailer->CharSet  = "utf-8";
-        $phpmailer->Username = 'admin';
-        $phpmailer->Password = 'admin1';
-        $phpmailer->SMTPSecure = false;
-        $phpmailer->From = 'moises@gmail.com';
-        $phpmailer->FromName= 'moises';
     }
 
     public static function save_play_in_history( ) {
-        $play = $_POST['play'];
+        $play = $_POST['data'];
         $query = new WP_Query( array(
             'post_type' => 'rulette_historial',
             'post_per_page' => -1
         ));
         $post_play = false;
         foreach( $query->posts as $post ) {
-            if( $post->post_name == $play['pack'] ) {
+            if( $post->post_name == $play['winner']['pack'] ) {
                 $post_play = $post;
             }
         };
 
         $data = array(
-            'tag' => $play['tag'],
-            'color' => $play['color']
+            'winner' => $play['winner']['tag'],
+            'plays' => $play['plays'],
+            'date' => $play['date']
         );
         if( $post_play !== false ) {
             $datas = json_decode($post_play->post_content);
-            $datas[] = $data;
+            $datas->results[] = $data;
             $my_post = array(
                 'ID' => $post_play->ID,
-                'post_title' => wp_strip_all_tags( $play['pack'] ),
+                'post_title' => wp_strip_all_tags( $play['winner']['pack'] ),
                 'post_content' => json_encode($datas),
                 'post_status' => 'publish',
                 'post_type' => "rulette_historial"
@@ -73,9 +60,14 @@ class WP_Rulette extends Plugink
             return wp_insert_post( $my_post );
         }
         else {
+            $datas = array(
+                'pack' => $play['winner']['pack'],
+                'results' => array( )
+            );
+            $datas['results'][] = $data;
             $my_post = array(
-                'post_title' => wp_strip_all_tags( $play['pack'] ),
-                'post_content' => json_encode( array( $data ) ),
+                'post_title' => wp_strip_all_tags( $play['winner']['pack'] ),
+                'post_content' => json_encode( $datas ),
                 'post_status' => 'publish',
                 'post_type' => "rulette_historial"
             );
@@ -85,26 +77,6 @@ class WP_Rulette extends Plugink
     }
 
     public static function get_play_history( ) {
-
-        $mail = new WP_custom_mail( );
-        try {
-            $mail->user( 'omartinez1618@gmail.com', 'omartinez1618@gmail.com' );
-            $mail->host('smtp.gmail.com');
-            $mail->port(465);
-
-            $mail->to('elmoises.reyderey@gmail.com');
-            $mail->subject('hola moises');
-            $mail->body('ejemplo de body');
-            $mail->send( );
-
-            echo 'Message has been sent correctamente';
-        } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-        }
-        
-        // wp_die();
-
-        return 'listo email enviado';
         $datas = array( );
         $query = new WP_Query(array(
             'post_type' => 'rulette_historial',
