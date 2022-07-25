@@ -1,5 +1,5 @@
 class Board {
-	constructor( ) {
+	constructor({scope}) {
 		this.selected
 
         document.querySelector('.board-container')
@@ -26,7 +26,7 @@ class Board {
         document.querySelectorAll('.board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
         if (target.className === 'board-tag') {
             target.setAttribute('class', 'board-tag selected');
-            this.selected = target;
+            this.selected = +target.innerHTML;
         }
 	}
 }

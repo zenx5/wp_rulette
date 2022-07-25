@@ -2,12 +2,14 @@ class scope {
 	constructor( pack, sectors ) {
 		this.pack = pack
 		this.ruleta = new Ruleta({
+			scope: this,
 	        sectors: sectors,
 	        radius: 180,
 	        innerRadius: 90,
 	        backRadius: 185,
 	        backColor: 'yellow',
-	        callback_winner: ( sectors, data, plays ) => {
+	        callback_winner: ( sectors, data ) => {
+	        	let plays = this.query.getPlays( );
 	            let winnerIndex = sectors.findIndex( element => element.tag === data.text );
 	            let winner = sectors[ winnerIndex ];
 	            let datas = {
@@ -31,26 +33,20 @@ class scope {
 	        },
 	    });
 
-	    this.board = new Board( );
+	    this.query = new Query({scope: this});
 
-	    //datos de prueba
-	    let players = [
-	    	{
-	    		id: 1,
-	    		name: 'moises',
-	    		plays: [
-		    		{
-		    			tag: 10,
-		    			mount: 100
-		    		},
-		    		{
-		    			tag: 15,
-		    			mount: 150
-		    		}
-	    		]
-	    	}
-	    ]
-	    this.panel = new Panel( players );
+	    this.board = new Board({scope: this});
+
+	    this.panel = new Panel({scope: this});
+	}
+
+	savePlay( event ) {
+		let tag = this.board.selected;
+		let play = {
+			tag: tag,
+			mount: 150
+		}
+		this.query.savePlay( this.panel.selectedPlayer, play );
 	}
 }
 

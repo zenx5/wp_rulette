@@ -203,6 +203,7 @@ class WP_Rulette extends Plugink
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/board/board.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/panel/panel.js"></script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Querys.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/controller.js"></script>
         <script
           src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -319,6 +320,7 @@ class WP_Rulette extends Plugink
         ob_start( );
         ?>
         <div id="container-panel"></div>
+        <button id="btn_save_play" >Jugar</button>
 
         <?php
         $html = ob_get_contents();

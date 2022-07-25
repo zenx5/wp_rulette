@@ -1,5 +1,6 @@
 class Ruleta {
     constructor({
+        scope,
         callback_winner,
         canvasId,
         dificultad,
@@ -24,7 +25,6 @@ class Ruleta {
         this.backRadius = backRadius || this.radius;
         this.duration = duration || 5;
 
-        this.plays = [];
         this.previusPlays = [];
         this.wheelSpinning = false;
 
@@ -102,10 +102,6 @@ class Ruleta {
         })
     }
 
-    addPlay( play ) {
-        this.plays.push( play );
-    }
-
     playSound( ) {
         if( !this.audio ) return;
         this.audio.pause( );
@@ -147,7 +143,7 @@ class Ruleta {
     // Called when the animation has finished.
     alertWinner( ) {
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment(), this.plays );
+        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
     }
 
     initSpin( ) {
@@ -160,7 +156,7 @@ class Ruleta {
                 break;
                 
             case 'hard':
-                array_temp = [ ...this.plays, ...this.rulette_sectors ];
+                array_temp = [ ...this.rulette_sectors ];
                 
                 let array_arrays = [];
                 while( array_temp.length ) {
@@ -187,9 +183,6 @@ class Ruleta {
                 for( let i=0; i<level.restart; i++ ) {
                     index = GetRandomInteger( 0, this.rulette_sectors.length-1 );
                     
-                    if( this.plays.findIndex( element => element.tag == index ) == -1 ) {
-                        break;
-                    }
                 }
                 break;
         }

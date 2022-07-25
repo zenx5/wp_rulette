@@ -1,9 +1,14 @@
 class Panel {
-	constructor( players ) {
-		this.players = players;
+	constructor({ scope }) {
+		this.scope = scope;
+		this.players = this.scope.query.getPlayers( );
 		this.selectedPlayer = null;
 
 		document.querySelector('#container-panel').innerHTML = this.render( )
+        document.querySelector("#btn_save_play").addEventListener('click', event => {
+        	this.scope.savePlay( );
+        	document.querySelector('#container-panel').innerHTML = this.render( );
+        })
 
         document.querySelectorAll('tr').forEach( element => {
             element.addEventListener('click', this.selectPlayer.bind( this, element ) );
@@ -12,7 +17,7 @@ class Panel {
 	}
 
 	set select( newValue ) {
-		this.selectedPlayer = newValue;
+		this.selectedPlayer = +newValue;
 	}
 
 	selectPlayer( element ) {
@@ -24,7 +29,6 @@ class Panel {
 	}
 
 	render( ) {
-		console.log(this)
 		let template = `
 			<table>
 	            <thead>
@@ -35,8 +39,7 @@ class Panel {
 	            </thead>
 	            <tbody>
 	     `
-    	for( let player of this.players ) {
-    		console.log(player)
+    	for( let player of this.scope.query.getPlayers( ) ) {
 			template += `
 	            <tr data-player="${player['id']}" >
 	                <td> ${player['name']} </td>
@@ -55,7 +58,6 @@ class Panel {
         template += `
 			    </tbody>
 			</table>
-			<button id="btn_save_play" >Jugar</button>
         `
         return template;
     }
