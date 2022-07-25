@@ -27,6 +27,7 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_shortcode('rulette_panel', array('WP_Rulette', 'render_panel'));
     }
 
     public static function save_play_in_history( ) {
@@ -200,6 +201,9 @@ class WP_Rulette extends Plugink
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/board/board.js"></script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/panel/panel.js"></script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/controller.js"></script>
         <script
           src="https://code.jquery.com/jquery-3.6.0.min.js"
           integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
@@ -242,7 +246,7 @@ class WP_Rulette extends Plugink
         $modo = isset( $attrs['modo'] )?$attrs['modo']:'asc';
 
         $max = count( $sectores );
-        $aux = [];        
+        $aux = [];
         if( $order != null ){
             for( $i = 0; $i < $max-1; $i++ ) {
                 for( $j = 0; $j < $max-1; $j++ ) {
@@ -255,7 +259,7 @@ class WP_Rulette extends Plugink
                         $aux = $sectores[$j];
                         $sectores[$j] = $sectores[$j+1];
                         $sectores[$j+1] = $aux;
-                   }             
+                   }
                 }
             }
         }
@@ -287,38 +291,39 @@ class WP_Rulette extends Plugink
                 } ?>
             </div>
         </div>
-        <script>
-            (function() {
-                document.querySelector('.board-container')
-                    .addEventListener('click', function(ev) {
-                        const target = ev.target;
-                        document.querySelectorAll('board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
-                        if (target.className === 'board-tag') {
-                            target.setAttribute('class', 'board-tag selected');
-                        }
-                    });
+    </div>
+    <?php
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
 
+    public static function render_panel( $attrs ) {
+        if (!isset($attrs['pack'])) return;
+        $players = array(
+            array(
+                'id' => 1,
+                'name' => 'Moises', 
+                'plays' => array(
+                    array(
+                        'tag' => 1,
+                        'mount' => 10
+                    ),
+                    array(
+                        'tag' => 5,
+                        'mount' => 100
+                    ),
+                ), 
+            )
+        );
+        ob_start( );
+        ?>
+        <div id="container-panel"></div>
 
-
-                /*
-                AQUI LA CREACION DE LA JUGADA POR METODO POST
-                    $.ajax({
-                        method: 'post',
-                        url: url de api,
-                        data: {
-                            tag: $(this).text(),
-                            value: $('#value').val(),
-                            user: $('#user').data('id')
-                        }
-                    })
-                */
-
-            })();
-        </script>
-<?php
-    $html = ob_get_contents();
-    ob_end_clean();
-    return $html;    
+        <?php
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
     }
 
     public static function save_post($post_id, $post = null)

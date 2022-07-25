@@ -228,39 +228,3 @@ function getRandomNumber( min, max ) {
 function GetRandomInteger( min, max ) {
     return Math.floor( getRandomNumber( min, max+1 ) );
 }
-
-addEventListener('load', async ev => {
-    const pack = document.querySelector('canvas').dataset.pack
-    const sectors = await fetch(location.origin+'/ruleta/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
-    const sound = new Audio(`${location.origin}/ruleta/wp-content/plugins/wp_rulette/audio.mp3`)
-    new Ruleta({
-        callback_winner: ( sectors, data, plays ) => {
-            let winnerIndex = sectors.findIndex( element => element.tag === data.text );
-            let winner = sectors[ winnerIndex ];
-            let datas = {
-                winner: winner,
-                plays: plays,
-                date: new Date( )
-            };
-            // return console.log(datas);
-            $.ajax({
-                url: `${location.origin}/ruleta/wp-json/rulette/v1/plays`,
-                type: 'post',
-                data: {
-                    data: datas
-                },
-                success: _ => {
-                    console.log(_)
-                },
-                error: _ => {
-                    console.log(_)
-                }
-            })
-        },
-        sectors: sectors,
-        radius: 180,
-        innerRadius: 90,
-        backRadius: 185,
-        backColor: 'yellow',
-    })
-})
