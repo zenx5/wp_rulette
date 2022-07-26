@@ -1,13 +1,12 @@
 class Panel {
 	constructor({ scope }) {
 		this.scope = scope;
-		this.players = this.scope.query.getPlayers( );
 		this.selectedPlayer = null;
 
-		document.querySelector('#container-panel').innerHTML = this.render( )
+		this.render( );
         document.querySelector("#btn_save_play").addEventListener('click', event => {
         	this.scope.savePlay( );
-        	document.querySelector('#container-panel').innerHTML = this.render( );
+        	this.render( )
         })
 
         document.querySelectorAll('tr').forEach( element => {
@@ -29,6 +28,9 @@ class Panel {
 	}
 
 	render( ) {
+		let remove_play = id => {
+			console.log(id,this)
+		};
 		let template = `
 			<table>
 	            <thead>
@@ -45,11 +47,11 @@ class Panel {
 	                <td> ${player['name']} </td>
 	                <td>
         	`
-                    for( let play of player.plays ) {
+                    player.plays.forEach( (play, index) => {
                     	template += `
-                        	<p> jugado el ${play['tag']} por ${play.mount} </p>
+                        	<p> jugado el ${play['tag']} por ${play.mount} <button class="btn-delete-play" data-player="${player.id}" data-tag="${play.tag}">X</button> </p>
                     	`
-                    }
+                    })
             template += `
 	                </td>
 	            </tr>
@@ -59,6 +61,12 @@ class Panel {
 			    </tbody>
 			</table>
         `
-        return template;
+        document.querySelector('#container-panel').innerHTML = template
+		document.querySelectorAll(`p .btn-delete-play`).forEach( element => {
+	        element.addEventListener('click', event => {
+	        	this.scope.deletePlay( element.dataset.player, element.dataset.tag );
+	        	this.render( )
+	        })
+	    })
     }
 }

@@ -40,13 +40,18 @@ class scope {
 	    this.panel = new Panel({scope: this});
 	}
 
-	savePlay( event ) {
+	savePlay( ) {
 		let tag = this.board.selected;
+		let player_id = this.panel.selectedPlayer;
 		let play = {
 			tag: tag,
 			mount: 150
-		}
-		this.query.savePlay( this.panel.selectedPlayer, play );
+		};
+		if( tag && player_id ) this.query.savePlay( player_id, play );
+	}
+
+	deletePlay( player_id, play_tag ) {
+		this.query.deletePlay( player_id, play_tag );
 	}
 }
 
