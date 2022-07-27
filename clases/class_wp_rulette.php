@@ -27,39 +27,63 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
-        add_action('wp_ajax_save_play','save_play_in_history');
-        add_action('wp_ajax_nopriv_save_play','save_play_in_history');
     }
-
-    // public static function rulette_insertar_js( ){
-    //     if (!is_home()) return;
-
-    //     wp_register_script('rulete_script', WP_PLUGIN_DIR.'wp_rulette/src/ruleta.js', array('jquery'), '1', true );
-    //     wp_enqueue_script('rulete_script');
-
-    //     wp_localize_script('rulete_script','rulette_var',array('ajaxurl'=>admin_url('admin-ajax.php')));
-    // }
-
 
     public static function save_play_in_history( ) {
         $play = $_POST['play'];
-        $my_post = array(
-          'post_title'    => wp_strip_all_tags( $play['name'] ),
-          'post_content'  => $play['tag'],
-          'post_status'   => 'publish',
-          'post_type'   => "historial"
+        $query = new WP_Query( array(
+            'post_type' => 'rulette_historial',
+            'post_per_page' => -1
+        ));
+        $post_play = false;
+        foreach( $query->posts as $post ) {
+            if( $post->post_name == $play['pack'] ) {
+                $post_play = $post;
+            }
+        };
+
+        $data = array(
+            'tag' => $play['tag'],
+            'color' => $play['color']
         );
-        return wp_insert_post( $my_post );
-        return $_POST;
+        if( $post_play !== false ) {
+            $datas = json_decode($post_play->post_content);
+            $datas[] = $data;
+            $my_post = array(
+                'ID' => $post_play->ID,
+                'post_title' => wp_strip_all_tags( $play['pack'] ),
+                'post_content' => json_encode($datas),
+                'post_status' => 'publish',
+                'post_type' => "rulette_historial"
+            );
+            return wp_insert_post( $my_post );
+        }
+        else {
+            $my_post = array(
+                'post_title' => wp_strip_all_tags( $play['pack'] ),
+                'post_content' => json_encode( array( $data ) ),
+                'post_status' => 'publish',
+                'post_type' => "rulette_historial"
+            );
+            return wp_insert_post( $my_post );
+        }
+
     }
 
     public static function get_play_history( ) {
         $datas = array( );
         $query = new WP_Query(array(
-            'post_type' => 'historial',
+            'post_type' => 'rulette_historial',
             'posts_per_page' => -1
         ));
         $rulette_sectors = self::get_sectores( $_GET['pack'] );
+
+        foreach( $query->posts as $post ) {
+            if( $post->post_name == $_GET['pack'] ) {
+                $datas = json_decode($post->post_content);
+            }
+        }
+        return $datas;
 
         foreach( $query->posts as $post ) {
             $play;
@@ -181,10 +205,6 @@ class WP_Rulette extends Plugink
             }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
-        <script type="text/javascript">
-            // var Rulette_sectors = <?= json_encode(self::get_sectores('ilumination')); ?>;
-            // console.log(Rulette_sectors)
-        </script>
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>
@@ -226,9 +246,32 @@ class WP_Rulette extends Plugink
     {
         if (!isset($attrs['pack'])) return;
         $sectores = self::get_sectores($attrs['pack']);
+        $order = isset( $attrs['order'] )?$attrs['order']:null;
+        $modo = isset( $attrs['modo'] )?$attrs['modo']:'asc';
+
+        $max = count( $sectores );
+        $aux = [];        
+        if( $order != null ){
+            for( $i = 0; $i < $max-1; $i++ ) {
+                for( $j = 0; $j < $max-1; $j++ ) {
+                    if( $modo == 'asc' ){
+                        $bool = $sectores[$j][$order] > $sectores[$j+1][ $order ];                    
+                    }else{
+                        $bool = $sectores[$j][$order] < $sectores[$j+1][ $order ];
+                    }   
+                    if( $bool ) {
+                        $aux = $sectores[$j];
+                        $sectores[$j] = $sectores[$j+1];
+                        $sectores[$j+1] = $aux;
+                   }             
+                }
+            }
+        }
+        
         $byRow = 3;
         $columnCount = 0;
         $width = 100 / $byRow;
+        ob_start();
     ?>
         <div class="board-container">
             <div class="board-content">
@@ -281,6 +324,9 @@ class WP_Rulette extends Plugink
             })();
         </script>
 <?php
+    $html = ob_get_contents();
+    ob_end_clean();
+    return $html;    
     }
 
     public static function save_post($post_id, $post = null)
@@ -335,7 +381,7 @@ class WP_Rulette extends Plugink
             'show_in_nav_menus' => false,
         ]);
 
-        self::create_type_post('historial', 'Historial de la ruleta', 'Historial de la ruleta', [
+        self::create_type_post('rulette_historial', 'Historial de la ruleta', 'Historial de la ruleta', [
             'description' => 'Guarda las diferentes jugadas que s han realizado',
             'public'       => false,
             'can_export'   => false,

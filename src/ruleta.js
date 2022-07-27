@@ -6,58 +6,67 @@ class Ruleta {
         dificultad,
         levels,
         sectors,
-        audio
+        audio,
+        radius,
+        innerRadius,
+        backColor,
+        backRadius,
+        duration
     } = {}) {
+
+        this.callback_winner = callback_winner;
+        this.jugadas = jugadas || [];
+        this.dificultad = dificultad || "easy";
+        this.levels = levels || [];
         this.rulette_sectors = sectors || []
-        this.rulette_segments = sectors.map( elem => elem );
+        this.audio = audio;
+        this.radius = radius || 180;
+        this.innerRadius = innerRadius || 0;
+        this.backColor = backColor||'yellow';
+        this.backRadius = backRadius || this.radius;
+        this.duration = duration || 5;
 
-        this.rulette_sectors.sort( (elemA, elemB) => elemA.tag - elemB.tag );
-        this.rulette_segments.sort( (elemA, elemB) => elemA.order - elemB.order )
+        this.wheelSpinning = false;
 
-        let rulette_segments = this.rulette_segments.map( element => {
+        this.rulette_sectors.sort( (elemA, elemB) => elemA.order - elemB.order );
+
+        let rulette_segments = this.rulette_sectors.map( element => {
             return {
                 'fillStyle': element.color,
                 'text': element.tag
             }
         });
 
-        this.levels = levels || [];
-        this.wheelSpinning = false;
-        this.callback_winner = callback_winner;
-        this.dificultad = dificultad || "easy";
-        this.jugadas = jugadas || [];
-        this.radius = 180;
-        this.audio = audio;
-
         this.innerWheel = new Winwheel({
             'canvasId': canvasId || 'canvas',
             'numSegments' : rulette_segments.length,
             'outerRadius' : this.radius,
-            'innerRadius' : this.radius/2,
+            'innerRadius' : this.innerRadius,
             'textFillStyle': 'white',
             'textAlignment': 'outer',
             // 'textOrientation': 'curved', 
             'segments': rulette_segments,
-            // 'drawMode': 'image',
             'animation': {
-                'type': 'spinToStop',                     // Define animation more or less as normal, except for the callbackAfter().
-                'duration': 5,
-                'spins': 8,
-                'callbackAfter' : this.drawWheels.bind( this ),     // Call back after each frame of the animation a function we can draw the inner wheel from.
-                'callbackFinished': this.alertPrize.bind( this )
+                'type': 'spinToStop',
+                'duration': this.duration,
+                'spins': this.duration*1.5,
+                'callbackAfter' : this.drawWheels.bind( this ),
+                'callbackFinished': this.alertWinner.bind( this ),
+                'callbackSound': this.playSound.bind( this ),
+                'soundTrigger': 'pin'
             },
             'pins': {
-                'number'     : 24,
+                'number'     : this.rulette_sectors.length,
                 'fillStyle'  : 'silver',
             }
         });
 
-        this.ss = new Winwheel({
+        this.back = new Winwheel({
             canvasId: canvasId || 'canvas',
             numSegments: 1,
-            innerRadius: this.radius/2-8,
-            outerRadius: this.radius+5,
-            fillStyle: 'yellow',
+            innerRadius: Math.max(this.innerRadius-8, 0),
+            outerRadius: this.backRadius,
+            fillStyle: this.backColor,
             segments: []
         })
 
@@ -85,19 +94,19 @@ class Ruleta {
         loadImage.src = image.toDataURL( )
         loadImage.onload = _ => {
             this.outerWheel.wheelImage = image;
-            this.drawWheels( )
-
+            this.drawWheels( );
         }
 
         document.querySelector('#btn_spin').addEventListener( 'click', event => {
             this.initSpin( )
         })
     }
-    
+
     playSound( ) {
-        this.audio.pause();
-        this.audio.currentTime = 0;
-        this.audio.play();
+        if( !this.audio ) return;
+        this.audio.pause( );
+        this.audio.currentTime = 0.5;
+        this.audio.play( );
     }
 
     generateImage( ) {
@@ -106,7 +115,7 @@ class Ruleta {
         let scale = 4;
         canvas.width = this.radius*scale*2;
         canvas.height = this.radius*scale*2;
-        let d_angle = (360/this.rulette_segments.length)*Math.PI/180
+        let d_angle = (360/this.rulette_sectors.length)*Math.PI/180
         let dx = d_angle*this.radius;
         
         this.rulette_sectors.forEach( (element, index) => {
@@ -126,16 +135,13 @@ class Ruleta {
     // This function is called after the outer wheel has drawn during the animation.
     drawWheels( ) {
         this.outerWheel.rotationAngle = this.innerWheel.rotationAngle;
-        this.ss.draw( );
+        this.back.draw( );
         this.outerWheel.draw(false);
         this.innerWheel.draw(false);
     }
 
     // Called when the animation has finished.
-    alertPrize( ) {
-        var winningInnerSegment = this.innerWheel.getIndicatedSegment().text;
-        let winner = this.rulette_sectors.findIndex( element => element.tag === winningInnerSegment )
-
+    alertWinner( ) {
         this.wheelSpinning = false;
         this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
     }
@@ -184,12 +190,12 @@ class Ruleta {
                 }
                 break;
         }
-        this.startSpin( this.getAnimalAngle( index ) );
+        this.startSpin( this.getSectorAngle( index ) );
     }
 
-    getAnimalAngle( value ) {
-        let pos = this.rulette_segments.findIndex( element => element.tag == value );
-        let delta_angle = 360/this.rulette_segments.length;
+    getSectorAngle( value ) {
+        let pos = this.rulette_sectors.findIndex( element => element.tag == value );
+        let delta_angle = 360/this.rulette_sectors.length;
         let angle = getRandomNumber( pos*delta_angle, (pos+1)*delta_angle )
         return angle;
     }
@@ -222,18 +228,18 @@ function GetRandomInteger( min, max ) {
 
 addEventListener('load', async ev => {
     const pack = document.querySelector('canvas').dataset.pack
-    console.log( pack )
-    const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json()) 
-    console.log( sectors )
-    console.log(`${location.origin}/wp-json/rulette/v1/plays`)
+    const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
+    const sound = new Audio(`${location.origin}/wp-content/plugins/wp_rulette/audio.mp3`)
     new Ruleta({
-        callback_winner: data => {
-            console.log(data);
+        callback_winner: ( sectors, data ) => {
+            let winnerIndex = sectors.findIndex( element => element.tag === data.text );
+            let winner = sectors[ winnerIndex ];
+
             $.ajax({
                 url: `${location.origin}/wp-json/rulette/v1/plays`,
                 type: 'post',
                 data: {
-                    play: data
+                    play: winner
                 },
                 success: _ => {
                     console.log(_)
@@ -243,6 +249,10 @@ addEventListener('load', async ev => {
                 }
             })
         },
-        sectors: sectors
+        sectors: sectors,
+        radius: 180,
+        innerRadius: 90,
+        backRadius: 185,
+        backColor: 'yellow',
     })
 })
