@@ -282,14 +282,14 @@ class WP_Rulette extends Plugink
                     $color = $sector['color'];
                     if ($columnCount == 0) {
                         echo "<div class='board-row'>";
-                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                        echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
                         $columnCount++;
                     } elseif ($columnCount == $byRow - 1) {
-                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                        echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
                         echo "</div>";
                         $columnCount = 0;
                     } else {
-                        echo "<div class='board-tag' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                        echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
                         $columnCount++;
                     }
                 } ?>
@@ -300,10 +300,19 @@ class WP_Rulette extends Plugink
                 document.querySelector('.board-container')
                     .addEventListener('click', function(ev) {
                         const target = ev.target;
+                        let plays = JSON.parse( sessionStorage.getItem('plays') ) || []
                         document.querySelectorAll('board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
                         if (target.className === 'board-tag') {
                             target.setAttribute('class', 'board-tag selected');
+                            plays.push({
+                                tag: target.dataset.tag,
+                                player: 'user'
+                            })
+                        }else{
+                            target.setAttribute('class', 'board-tag');
+                            plays = plays.filter( elem => elem.tag !== target.dataset.tag )
                         }
+                        sessionStorage.setItem( 'plays', JSON.stringify(plays) );
                     });
 
 
