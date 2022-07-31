@@ -317,18 +317,6 @@ class WP_Rulette extends Plugink
 
 
 
-                /*
-                AQUI LA CREACION DE LA JUGADA POR METODO POST
-                    $.ajax({
-                        method: 'post',
-                        url: url de api,
-                        data: {
-                            tag: $(this).text(),
-                            value: $('#value').val(),
-                            user: $('#user').data('id')
-                        }
-                    })
-                */
 
             })();
         </script>

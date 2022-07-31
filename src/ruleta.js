@@ -205,7 +205,7 @@ class Ruleta {
     // -------------------------------------------------------
     startSpin( value ) {
         // Ensure that spinning can't be clicked again while already running.
-        if ( this.wheelSpinning == false ) {
+        if ( this.wheelSpinning === false ) {
             // Reset things with inner and outer wheel so spinning will work as expected. Without the reset the
             // wheel will probably just move a small amount since the rotationAngle would be close to the targetAngle
             // figured out by the animation.
@@ -234,7 +234,21 @@ addEventListener('load', async ev => {
         callback_winner: ( sectors, data ) => {
             let winnerIndex = sectors.findIndex( element => element.tag === data.text );
             let winner = sectors[ winnerIndex ];
+            /*
+                const plays = JSON.parse( sessionStorage.getItem('plays') )
+                $.ajax({
+                    method: 'post',
+                    url: url de api,
+                    data: {
+                        tag: $(this).text(),
+                        value: $('#value').val(),
+                        user: $('#user').data('id')
+                    }
+                })
+            */
 
+            console.log(winner)
+            
             $.ajax({
                 url: `${location.origin}/wp-json/rulette/v1/plays`,
                 type: 'post',
