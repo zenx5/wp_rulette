@@ -402,7 +402,7 @@ class WP_Rulette extends Plugink
             'rewrite'      => false,
             'has_archive'  => false,
             'hierarchical' => false,
-            'supports'     => array('title'),
+            'supports'     => array('title', 'editor'),    
             'show_in_nav_menus' => false,
         ]);
 
