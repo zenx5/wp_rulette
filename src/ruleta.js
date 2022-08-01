@@ -143,7 +143,8 @@ class Ruleta {
     // Called when the animation has finished.
     alertWinner( ) {
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
+        //this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
+        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment(), sessionStorage.getItem('plays') || [] );
     }
 
     initSpin( ) {
@@ -231,7 +232,7 @@ addEventListener('load', async ev => {
     const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
     const sound = new Audio(`${location.origin}/wp-content/plugins/wp_rulette/audio.mp3`)
     new Ruleta({
-        callback_winner: ( sectors, data ) => {
+        callback_winner: ( sectors, data, plays ) => {
             let winnerIndex = sectors.findIndex( element => element.tag === data.text );
             let winner = sectors[ winnerIndex ];
             /*
@@ -247,13 +248,18 @@ addEventListener('load', async ev => {
                 })
             */
 
-            console.log(winner)
+            const datas = {
+                winner: winner,
+                plays: plays,
+                date: new Date( )
+            };
             
+            console.log( datas )
             $.ajax({
                 url: `${location.origin}/wp-json/rulette/v1/plays`,
                 type: 'post',
                 data: {
-                    play: winner
+                    data: datas
                 },
                 success: _ => {
                     console.log(_)
