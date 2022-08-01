@@ -4,14 +4,14 @@ class Panel {
 		this.selectedPlayer = null;
 
 		this.render( );
-        document.querySelector("#btn_save_play").addEventListener('click', event => {
-        	this.scope.savePlay( );
-        	this.render( )
-        })
+        // document.querySelector("#btn_save_play").addEventListener('click', event => {
+        // 	this.scope.savePlay( );
+        // 	this.render( )
+        // })s
 
-        document.querySelectorAll('tr').forEach( element => {
-            element.addEventListener('click', this.selectPlayer.bind( this, element ) );
-        });
+        // document.querySelectorAll('tr').forEach( element => {
+        //     element.addEventListener('click', this.selectPlayer.bind( this, element ) );
+        // });
 
 	}
 
@@ -61,12 +61,12 @@ class Panel {
 			    </tbody>
 			</table>
         `
-        document.querySelector('#container-panel').innerHTML = template
-		document.querySelectorAll(`p .btn-delete-play`).forEach( element => {
-	        element.addEventListener('click', event => {
-	        	this.scope.deletePlay( element.dataset.player, element.dataset.tag );
-	        	this.render( )
-	        })
-	    })
+  //       document.querySelector('#container-panel').innerHTML = template
+		// document.querySelectorAll(`p .btn-delete-play`).forEach( element => {
+	 //        element.addEventListener('click', event => {
+	 //        	this.scope.deletePlay( element.dataset.player, element.dataset.tag );
+	 //        	this.render( )
+	 //        })
+	 //    })
     }
 }
