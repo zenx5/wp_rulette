@@ -335,6 +335,28 @@ class WP_Rulette extends Plugink
     return $html;    
     }
 
+    public static function render_panel( $attrs ) {
+        if (!isset($attrs['pack'])) return;
+        $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
+        ob_start( );
+        ?>
+        <div class="panel-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Players</th>
+                        <th>Jugadas</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <?php
+        $html = ob_get_contents( );
+        ob_end_clean( );
+        return $html;
+    }
+
     public static function save_post($post_id, $post = null)
     {
         if("rulette_sector"  == get_post_type()) {
