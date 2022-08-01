@@ -7,11 +7,11 @@ class Panel {
         // document.querySelector("#btn_save_play").addEventListener('click', event => {
         // 	this.scope.savePlay( );
         // 	this.render( )
-        // })s
+        // })
 
-        // document.querySelectorAll('tr').forEach( element => {
-        //     element.addEventListener('click', this.selectPlayer.bind( this, element ) );
-        // });
+        document.querySelectorAll('panel-container tbody tr').forEach( element => {
+            element.addEventListener('click', this.selectPlayer.bind( this, element ) );
+        });
 
 	}
 
@@ -24,24 +24,14 @@ class Panel {
         	element.classList.remove('selected');
         });
 		element.classList.add('selected');
-		this.select = element.dataset.player
+		let id_player= element.dataset.player;
+		this.select = id_player;
+
 	}
 
 	render( ) {
-		let remove_play = id => {
-			console.log(id,this)
-		};
-		let template = `
-			<table>
-	            <thead>
-	                <tr>
-	                    <th>Players</th>
-	                    <th>Jugadas</th>
-	                </tr>
-	            </thead>
-	            <tbody>
-	     `
-    	for( let player of this.scope.query.getPlayers( ) ) {
+		let template = ``
+    	for( let player of this.scope.query.getPlayers() ) {
 			template += `
 	            <tr data-player="${player['id']}" >
 	                <td> ${player['name']} </td>
@@ -57,11 +47,7 @@ class Panel {
 	            </tr>
             `
         }
-        template += `
-			    </tbody>
-			</table>
-        `
-  //       document.querySelector('#container-panel').innerHTML = template
+        document.querySelector('.panel-container tbody').innerHTML = template
 		// document.querySelectorAll(`p .btn-delete-play`).forEach( element => {
 	 //        element.addEventListener('click', event => {
 	 //        	this.scope.deletePlay( element.dataset.player, element.dataset.tag );
