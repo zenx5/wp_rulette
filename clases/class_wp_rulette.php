@@ -30,28 +30,35 @@ class WP_Rulette extends Plugink
     }
 
     public static function save_play_in_history( ) {
-        $play = $_POST['play'];
+        $play = $_POST['data'];
         $query = new WP_Query( array(
             'post_type' => 'rulette_historial',
             'post_per_page' => -1
         ));
         $post_play = false;
         foreach( $query->posts as $post ) {
-            if( $post->post_name == $play['pack'] ) {
+            if( $post->post_name == $play['winner']['pack'] ) {
                 $post_play = $post;
             }
         };
 
         $data = array(
-            'tag' => $play['tag'],
-            'color' => $play['color']
+            'winner' => $play['winner']['tag'],
+            'plays' => $play['plays'],
+            'date' => $play['date']
         );
+
         if( $post_play !== false ) {
             $datas = json_decode($post_play->post_content);
-            $datas[] = $data;
+            //if( is_array( $datas->results ) ){
+                $datas->results[] = $data;
+            /*}
+            else{
+                $datasresults = [$data];
+            }*/
             $my_post = array(
                 'ID' => $post_play->ID,
-                'post_title' => wp_strip_all_tags( $play['pack'] ),
+                'post_title' => wp_strip_all_tags( $play['winner']['pack'] ),
                 'post_content' => json_encode($datas),
                 'post_status' => 'publish',
                 'post_type' => "rulette_historial"
@@ -59,9 +66,14 @@ class WP_Rulette extends Plugink
             return wp_insert_post( $my_post );
         }
         else {
+            $datas = [
+                'pack' => $play['winner']['pack'],
+                'results' => [$data]
+            ];
+            //$datas['results'][] = $data;
             $my_post = array(
-                'post_title' => wp_strip_all_tags( $play['pack'] ),
-                'post_content' => json_encode( array( $data ) ),
+                'post_title' => wp_strip_all_tags( $play['winner']['pack'] ),
+                'post_content' => json_encode( array( $datas ) ),
                 'post_status' => 'publish',
                 'post_type' => "rulette_historial"
             );
@@ -192,16 +204,19 @@ class WP_Rulette extends Plugink
             }
 
             .board-tag {
-                border: 1px solid #0005;
+                border: 2px solid white;
                 text-align: center;
                 font-weight: bold;
                 color: white;
                 cursor: pointer;
                 opacity: 0.6;
+                padding: 10px;
             }
 
             .board-tag.selected {
                 opacity: 1;
+                border: 4px solid #00f;
+                padding: 8px;
             }
         </style>
         <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
@@ -248,6 +263,10 @@ class WP_Rulette extends Plugink
         $sectores = self::get_sectores($attrs['pack']);
         $order = isset( $attrs['order'] )?$attrs['order']:null;
         $modo = isset( $attrs['modo'] )?$attrs['modo']:'asc';
+        $exclude = isset( $attrs['exclude'] )?$attrs['exclude']:'';
+        $type_exclude = isset( $attrs['type_exclude'] )?$attrs['type_exclude']:'partial';
+
+        $exclude = explode(',', $exclude);
 
         $max = count( $sectores );
         $aux = [];        
@@ -279,59 +298,46 @@ class WP_Rulette extends Plugink
             </div>
             <div class="board-content">
                 <?php foreach ($sectores as $sector) {
-                    $color = $sector['color'];
-                    if ($columnCount == 0) {
-                        echo "<div class='board-row'>";
-                        echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
-                        $columnCount++;
-                    } elseif ($columnCount == $byRow - 1) {
-                        echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
-                        echo "</div>";
-                        $columnCount = 0;
-                    } else {
-                        echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
-                        $columnCount++;
+                    if( !in_array( $sector['tag'], $exclude) ){
+                        $color = $sector['color'];
+                        if ($columnCount == 0) {
+                            echo "<div class='board-row'>";
+                            echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                            $columnCount++;
+                        } elseif ($columnCount == $byRow - 1) {
+                            echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                            echo "</div>";
+                            $columnCount = 0;
+                        } else {
+                            echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                            $columnCount++;
+                        }
                     }
                 } ?>
+                <?php 
+                    if( $type_exclude == 'partial' ){
+                        foreach ($sectores as $sector) { 
+                            if( in_array( $sector['tag'], $exclude) ){
+                                $color = $sector['color'];
+                                if ($columnCount == 0) {
+                                    echo "<div class='board-row'>";
+                                    echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                                    $columnCount++;
+                                } elseif ($columnCount == $byRow - 1) {
+                                    echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                                    echo "</div>";
+                                    $columnCount = 0;
+                                } else {
+                                    echo "<div class='board-tag' data-tag='".$sector['tag']."' style='width:$width%;background-color:$color;'>" . $sector['tag'] . "</div>";
+                                    $columnCount++;
+                                }
+                            }
+                        }
+                    }
+                ?>
             </div>
         </div>
-        <script>
-            (function() {
-                document.querySelector('.board-container')
-                    .addEventListener('click', function(ev) {
-                        const target = ev.target;
-                        let plays = JSON.parse( sessionStorage.getItem('plays') ) || []
-                        document.querySelectorAll('board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
-                        if (target.className === 'board-tag') {
-                            target.setAttribute('class', 'board-tag selected');
-                            plays.push({
-                                tag: target.dataset.tag,
-                                player: 'user'
-                            })
-                        }else{
-                            target.setAttribute('class', 'board-tag');
-                            plays = plays.filter( elem => elem.tag !== target.dataset.tag )
-                        }
-                        sessionStorage.setItem( 'plays', JSON.stringify(plays) );
-                    });
-
-
-
-                /*
-                AQUI LA CREACION DE LA JUGADA POR METODO POST
-                    $.ajax({
-                        method: 'post',
-                        url: url de api,
-                        data: {
-                            tag: $(this).text(),
-                            value: $('#value').val(),
-                            user: $('#user').data('id')
-                        }
-                    })
-                */
-
-            })();
-        </script>
+        <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/board.js"></script>
 <?php
     $html = ob_get_contents();
     ob_end_clean();
@@ -369,8 +375,6 @@ class WP_Rulette extends Plugink
             'hierarchical' => false,
             'supports'     => array('title'),
             'taxonomies' => ['gamepack'],
-            //'menu_icon'    => pods_svg_icon('pods'),
-            //'menu_position' => 5,
             'show_in_nav_menus' => false,
         ]);
 
@@ -385,15 +389,13 @@ class WP_Rulette extends Plugink
             'has_archive'  => false,
             'hierarchical' => false,
             'supports'     => array('title'),
-            //'menu_icon'    => pods_svg_icon('pods'),
-            //'menu_position' => 5,
             'show_in_nav_menus' => false,
         ]);
 
         self::create_type_post('rulette_historial', 'Historial de la ruleta', 'Historial de la ruleta', [
-            'description' => 'Guarda las diferentes jugadas que s han realizado',
+            'description' => 'Guarda las diferentes jugadas que se han realizado',
             'public'       => false,
-            'can_export'   => false,
+            'can_export'   => true,
             'show_ui'      => true,
             'show_in_menu' => true,
             'query_var'    => false,
@@ -401,8 +403,6 @@ class WP_Rulette extends Plugink
             'has_archive'  => false,
             'hierarchical' => false,
             'supports'     => array('title'),
-            //'menu_icon'    => pods_svg_icon('pods'),
-            //'menu_position' => 5,
             'show_in_nav_menus' => false,
         ]);
 

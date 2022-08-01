@@ -143,7 +143,8 @@ class Ruleta {
     // Called when the animation has finished.
     alertWinner( ) {
         this.wheelSpinning = false;
-        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
+        //this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment() );
+        this.callback_winner && this.callback_winner( this.rulette_sectors, this.innerWheel.getIndicatedSegment(), sessionStorage.getItem('plays') || [] );
     }
 
     initSpin( ) {
@@ -205,7 +206,7 @@ class Ruleta {
     // -------------------------------------------------------
     startSpin( value ) {
         // Ensure that spinning can't be clicked again while already running.
-        if ( this.wheelSpinning == false ) {
+        if ( this.wheelSpinning === false ) {
             // Reset things with inner and outer wheel so spinning will work as expected. Without the reset the
             // wheel will probably just move a small amount since the rotationAngle would be close to the targetAngle
             // figured out by the animation.
@@ -231,15 +232,34 @@ addEventListener('load', async ev => {
     const sectors = await fetch(location.origin+'/wp-json/rulette/v1/sectors?pack='+pack).then(response=>response.json())
     const sound = new Audio(`${location.origin}/wp-content/plugins/wp_rulette/audio.mp3`)
     new Ruleta({
-        callback_winner: ( sectors, data ) => {
+        callback_winner: ( sectors, data, plays ) => {
             let winnerIndex = sectors.findIndex( element => element.tag === data.text );
             let winner = sectors[ winnerIndex ];
+            /*
+                const plays = JSON.parse( sessionStorage.getItem('plays') )
+                $.ajax({
+                    method: 'post',
+                    url: url de api,
+                    data: {
+                        tag: $(this).text(),
+                        value: $('#value').val(),
+                        user: $('#user').data('id')
+                    }
+                })
+            */
 
+            const datas = {
+                winner: winner,
+                plays: plays,
+                date: new Date( )
+            };
+            
+            console.log( datas )
             $.ajax({
                 url: `${location.origin}/wp-json/rulette/v1/plays`,
                 type: 'post',
                 data: {
-                    play: winner
+                    data: datas
                 },
                 success: _ => {
                     console.log(_)
