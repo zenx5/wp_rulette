@@ -273,6 +273,7 @@ class WP_Rulette extends Plugink
                     </thead>
                     <tbody></tbody>
                 </table>
+                <button class="btn-new-player" >Add new plyer</button>
             </div>
             <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
         <?php
