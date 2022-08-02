@@ -27,6 +27,7 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_shortcode('rulette_button', array('WP_Rulette', 'button'));
     }
 
     public static function save_play_in_history( ) {
@@ -230,26 +231,47 @@ class WP_Rulette extends Plugink
     <?php
     }
 
+    public static function button($attrs)
+    {   
+        $btn = isset($attrs['label']) ? $attrs['label'] : 'Lanzar';
+        if($btn=='') return;
+        ob_start();
+        ?>
+            <div class="power_controls">
+                <br />
+                <button id="btn_spin"><?=$btn?></button>
+            </div>
+        <?php
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
     public static function render_rulette($attrs)
     {
         if (!isset($attrs['pack'])) return;
         $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
+        $btn = isset($attrs['button']) ? $attrs['button'] : 'Lanzar';
         ob_start();
     ?>
         <table cellpadding="0" cellspacing="0" border="0">
             <tr>
-                <td>
-                    <div class="power_controls">
-                        <br />
-                        <button id="btn_spin">lanzar</button>
-                    </div>
-                </td>
                 <td width="438" height="582" class="the_wheel" style="text-align:center" valign="center">
                     <canvas id="canvas" width="434" height="434" data-pack="<?= $packname ?>">
                         <p style="color: white; text-align:center">Sorry, your browser doesn't support canvas. Please try another.</p>
                     </canvas>
                 </td>
             </tr>
+            <?php if($btn != ''): ?>
+            <tr>
+                <td>
+                    <div class="power_controls">
+                        <br />
+                        <button id="btn_spin"><?=$btn?></button>
+                    </div>
+                </td>
+            </tr>
+            <?php endif; ?>
         </table>
     <?php
         $html = ob_get_contents();
