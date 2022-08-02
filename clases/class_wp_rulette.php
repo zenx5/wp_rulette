@@ -316,9 +316,6 @@ class WP_Rulette extends Plugink
     ?>
         <div class="board-container">
             <div class="board-content">
-                <h3>Board</h3>
-            </div>
-            <div class="board-content">
                 <?php foreach ($sectores as $sector) {
                     if( !in_array( $sector['tag'], $exclude) ){
                         $color = $sector['color'];
