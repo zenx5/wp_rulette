@@ -9,7 +9,8 @@ class Panel {
         // 	this.render( )
         // })
 
-        document.querySelectorAll('panel-container tbody tr').forEach( element => {
+        document.querySelectorAll('.panel-container tbody tr').forEach( element => {
+        	console.log(element)
             element.addEventListener('click', this.selectPlayer.bind( this, element ) );
         });
 
@@ -20,13 +21,28 @@ class Panel {
 	}
 
 	selectPlayer( element ) {
-        document.querySelectorAll('tr').forEach( element => {
-        	element.classList.remove('selected');
-        });
+        // document.querySelectorAll('tr').forEach( element => {
+        // 	element.classList.remove('selected');
+        // });
 		element.classList.add('selected');
 		let id_player= element.dataset.player;
-		this.select = id_player;
+		console.log(this.selectedPlayer)
 
+		let plays = JSON.parse( sessionStorage.getItem('plays') );
+		let players = this.scope.query.getPlayers( );
+		let player = players.find( player => player.id == this.selectedPlayer ) || {};
+		console.log(player)
+		player.plays = plays;
+		sessionStorage.setItem('players', JSON.stringify( players ) );
+		player = players.find( player => player.id == id_player );
+		sessionStorage.setItem('plays', JSON.stringify( player.plays ) );
+		console.log(id_player)
+        document.querySelectorAll('.board-tag').forEach(e => e.setAttribute('class', 'board-tag'));
+        player.plays.forEach( play => {
+            document.querySelector("[data-tag='"+play.tag+"']").setAttribute('class','board-tag selected')
+        })
+
+		this.select = id_player;
 	}
 
 	render( ) {
@@ -39,7 +55,7 @@ class Panel {
         	`
                     player.plays.forEach( (play, index) => {
                     	template += `
-                        	<p> jugado el ${play['tag']} por ${play.mount} <button class="btn-delete-play" data-player="${player.id}" data-tag="${play.tag}">X</button> </p>
+                        	<p> jugado el ${play['tag']} por ${play.mount} <button class="btn-delete-play" data-player="${player.id}">X</button> </p>
                     	`
                     })
             template += `
