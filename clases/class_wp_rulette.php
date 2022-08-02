@@ -27,6 +27,7 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_shortcode('rulette_user', array('WP_Rulette', 'users'));
     }
 
     public static function save_play_in_history( ) {
@@ -255,6 +256,16 @@ class WP_Rulette extends Plugink
         $html = ob_get_contents();
         ob_end_clean();
         return $html;
+    }
+
+    public static function users($attrs){
+
+        ?>
+            <p>aqui van los usuarios</p>
+
+            <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
+
+        <?php
     }
 
     public static function board($attrs)
