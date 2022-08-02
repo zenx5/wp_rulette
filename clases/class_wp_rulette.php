@@ -234,9 +234,18 @@ class WP_Rulette extends Plugink
     {
         if (!isset($attrs['pack'])) return;
         $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
+        $btn = isset($attrs['button']) ? json_decode($attrs['button']) : true;
         ob_start();
     ?>
         <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td width="438" height="582" class="the_wheel" style="text-align:center" valign="center">
+                    <canvas id="canvas" width="434" height="434" data-pack="<?= $packname ?>">
+                        <p style="color: white; text-align:center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                    </canvas>
+                </td>
+            </tr>
+            <?php if($btn): ?>
             <tr>
                 <td>
                     <div class="power_controls">
@@ -244,12 +253,8 @@ class WP_Rulette extends Plugink
                         <button id="btn_spin">lanzar</button>
                     </div>
                 </td>
-                <td width="438" height="582" class="the_wheel" style="text-align:center" valign="center">
-                    <canvas id="canvas" width="434" height="434" data-pack="<?= $packname ?>">
-                        <p style="color: white; text-align:center">Sorry, your browser doesn't support canvas. Please try another.</p>
-                    </canvas>
-                </td>
             </tr>
+            <?php endif; ?>
         </table>
     <?php
         $html = ob_get_contents();
