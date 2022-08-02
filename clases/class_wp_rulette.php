@@ -27,6 +27,7 @@ class WP_Rulette extends Plugink
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_shortcode('rulette_button', array('WP_Rulette', 'button'));
     }
 
     public static function save_play_in_history( ) {
@@ -230,11 +231,27 @@ class WP_Rulette extends Plugink
     <?php
     }
 
+    public static function button($attrs)
+    {   
+        $btn = isset($attrs['label']) ? $attrs['label'] : 'Lanzar';
+        if($btn=='') return;
+        ob_start();
+        ?>
+            <div class="power_controls">
+                <br />
+                <button id="btn_spin"><?=$btn?></button>
+            </div>
+        <?php
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
     public static function render_rulette($attrs)
     {
         if (!isset($attrs['pack'])) return;
         $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
-        $btn = isset($attrs['button']) ? json_decode($attrs['button']) : true;
+        $btn = isset($attrs['button']) ? $attrs['button'] : 'Lanzar';
         ob_start();
     ?>
         <table cellpadding="0" cellspacing="0" border="0">
@@ -245,12 +262,12 @@ class WP_Rulette extends Plugink
                     </canvas>
                 </td>
             </tr>
-            <?php if($btn): ?>
+            <?php if($btn != ''): ?>
             <tr>
                 <td>
                     <div class="power_controls">
                         <br />
-                        <button id="btn_spin">lanzar</button>
+                        <button id="btn_spin"><?=$btn?></button>
                     </div>
                 </td>
             </tr>
