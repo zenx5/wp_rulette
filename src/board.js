@@ -1,6 +1,6 @@
 (function() {
     addEventListener('load', function() {
-        JSON.parse( sessionStorage.getItem('plays') ).forEach( play => {
+        ( JSON.parse( sessionStorage.getItem('plays') ) || []).forEach( play => {
             document.querySelector("[data-tag='"+play.tag+"']").setAttribute('class','board-tag selected')
         })
         document.querySelector('.board-container')
