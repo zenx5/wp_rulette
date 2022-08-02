@@ -259,13 +259,26 @@ class WP_Rulette extends Plugink
     }
 
     public static function users($attrs){
-
+        if (!isset($attrs['pack'])) return;
+        $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
+        ob_start( );
         ?>
-            <p>aqui van los usuarios</p>
-
+            <div class="panel-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Players</th>
+                            <th>Jugadas</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
             <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
-
         <?php
+        $html = ob_get_contents( );
+        ob_end_clean( );
+        return $html;
     }
 
     public static function board($attrs)
