@@ -261,8 +261,21 @@ class WP_Rulette extends Plugink
     public static function users($attrs){
 
         ?>
-            <p>aqui van los usuarios</p>
-
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Saldo</th>
+                    </tr>
+                </thead>
+                <tbody id="user-body">
+                    
+                </tbody>
+            </table>
+            <div>
+                <input type="text" />
+                <input type="number" />
+            </div>
             <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
 
         <?php
