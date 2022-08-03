@@ -61,7 +61,8 @@ class WP_Rulette extends Plugink
     }
     
     public static function difficulty_form($term){
-        $difficulty = get_term_meta( $term->term_id, 'difficulty')[0];
+        $difficulty = get_term_meta( $term->term_id, 'difficulty');
+        $difficulty = isset($difficulty[0])?$difficulty[0]:'-1';
         ?>
         <table class="form-table">
             <tr class="form-field">
