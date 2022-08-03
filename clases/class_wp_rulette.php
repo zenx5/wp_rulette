@@ -25,9 +25,49 @@ class WP_Rulette extends Plugink
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
         add_action('rest_api_init', array('WP_Rulette', 'api_rulette'));
         add_action('wp_head', array('WP_Rulette', 'head'));
+        add_action('gamepack_edit_form', array('WP_Rulette', 'difficulty_form'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
         add_shortcode('rulette_button', array('WP_Rulette', 'button'));
+    }
+
+    public static function get_packs(){
+        $packs = [];
+        $query = new WP_Query(array(
+            'post_type' => 'rulette_sector',
+            'posts_per_page' => -1,
+            'taxonomies' => 'pack'
+        ));
+        foreach ($query->posts as $post) {
+            $pack = wp_get_post_terms($post->ID, 'gamepack', ['fields' => 'names']);
+            if( !in_array($pack[0], $packs) ){
+                $packs[] = $pack[0];
+            }
+        }
+
+        return $packs;
+    }
+    
+    public static function difficulty_form(){
+        ?>
+        <script>
+            console.log(<?=json_encode(self::get_level())?>)
+        </script>
+        <table class="form-table">
+            <tr class="form-field">
+                <th scope="row">Dificultad</th>
+                <td>
+                    <select>
+                        <option>Seleccione</option>
+                        <?php foreach( self::get_level() as $level):?>
+                            <option value="<?=$level['ID']?>"><?=$level['label']?></option>
+                        <?php endforeach; ?>
+
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <?php
     }
 
     public static function save_play_in_history( ) {
@@ -163,7 +203,11 @@ class WP_Rulette extends Plugink
 
     
     public static function get_level( ) {
-        $datas = array( );
+        $datas = array([
+            'ID' => 0,
+            'label' => 'Default',
+            'restart' => 0
+        ] );
         $query = new WP_Query( array(
             'post_type' => 'rulette_level',
             'posts_per_page' => -1
@@ -171,8 +215,9 @@ class WP_Rulette extends Plugink
         foreach( $query->posts as $post ) {
             $metas = get_post_meta( $post->ID );
             $data = array(
-                'level' => $post->post_title,
-                'restart' => $metas['wp_rulette_restart'][0]
+                'ID' => $post->ID,
+                'label' => $post->post_title,
+                'restart' => intval( $metas['wp_rulette_restart'][0] )
             );
             $datas[] = $data;
         }
