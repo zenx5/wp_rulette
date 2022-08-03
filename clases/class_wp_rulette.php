@@ -34,26 +34,11 @@ class WP_Rulette extends Plugink
 
     public static function save_category($term_id){
         if( 'gamepack' == $_POST['taxonomy'] ){
-            // echo "<script>console.log(".json_encode($_POST).")</script>";
-            // echo "<br>";
-            // echo "Term ID: $term_id";        
             try{
-                //echo json_encode( 
                 update_term_meta($term_id, 'difficulty', $_POST['difficulty']);
-            // );
-                //echo "Result: ".json_encode(wp_update_term($term_id, 'gamepack' ) );
             }catch(Exception $err){
                 echo json_encode($err);
             }
-
-            
-                // 'name' => $_POST['name'],
-                // 'description' => $_POST['description'], 
-                // 'slug' => $_POST['slug'],
-                //'difficulty' => $_POST['difficulty']
-            
-            
-
         }
         
     }
