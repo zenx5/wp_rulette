@@ -25,9 +25,63 @@ class WP_Rulette extends Plugink
         add_action('draft_to_publish', array('WP_Rulette', 'save_post'));
         add_action('rest_api_init', array('WP_Rulette', 'api_rulette'));
         add_action('wp_head', array('WP_Rulette', 'head'));
+        add_action('gamepack_edit_form', array('WP_Rulette', 'difficulty_form'));
+        add_action('saved_gamepack', array('WP_Rulette', 'save_category'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+<<<<<<< HEAD
         add_shortcode('rulette_user', array('WP_Rulette', 'users'));
+=======
+        add_shortcode('rulette_button', array('WP_Rulette', 'button'));
+    }
+
+    public static function save_category($term_id){
+        if( 'gamepack' == $_POST['taxonomy'] ){
+            try{
+                update_term_meta($term_id, 'difficulty', $_POST['difficulty']);
+            }catch(Exception $err){
+                echo json_encode($err);
+            }
+        }
+        
+    }
+
+    public static function get_packs(){
+        $packs = [];
+        $query = new WP_Query(array(
+            'post_type' => 'rulette_sector',
+            'posts_per_page' => -1,
+            'taxonomies' => 'pack'
+        ));
+        foreach ($query->posts as $post) {
+            $pack = wp_get_post_terms($post->ID, 'gamepack', ['fields' => 'names']);
+            if( !in_array($pack[0], $packs) ){
+                $packs[] = $pack[0];
+            }
+        }
+
+        return $packs;
+    }
+    
+    public static function difficulty_form($term){
+        $difficulty = get_term_meta( $term->term_id, 'difficulty');
+        $difficulty = isset($difficulty[0])?$difficulty[0]:'-1';
+        ?>
+        <table class="form-table">
+            <tr class="form-field">
+                <th scope="row">Dificultad</th>
+                <td>
+                    <select id="difficulty" name="difficulty">
+                        <option <?=$difficulty=='-1'?'selected':''?> value="-1">Seleccione</option>
+                        <?php foreach( self::get_level() as $level):?>
+                            <option <?=$difficulty==$level['ID']?'selected':''?> value="<?=$level['ID']?>"><?=$level['label']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <?php
+>>>>>>> af965b3ba2eca8ed25fadb881d4112a3838c6c2e
     }
 
     public static function save_play_in_history( ) {
@@ -163,7 +217,11 @@ class WP_Rulette extends Plugink
 
     
     public static function get_level( ) {
-        $datas = array( );
+        $datas = array([
+            'ID' => 0,
+            'label' => 'Default',
+            'restart' => 0
+        ] );
         $query = new WP_Query( array(
             'post_type' => 'rulette_level',
             'posts_per_page' => -1
@@ -171,8 +229,9 @@ class WP_Rulette extends Plugink
         foreach( $query->posts as $post ) {
             $metas = get_post_meta( $post->ID );
             $data = array(
-                'level' => $post->post_title,
-                'restart' => $metas['wp_rulette_restart'][0]
+                'ID' => $post->ID,
+                'label' => $post->post_title,
+                'restart' => intval( $metas['wp_rulette_restart'][0] )
             );
             $datas[] = $data;
         }
@@ -231,26 +290,47 @@ class WP_Rulette extends Plugink
     <?php
     }
 
+    public static function button($attrs)
+    {   
+        $btn = isset($attrs['label']) ? $attrs['label'] : 'Lanzar';
+        if($btn=='') return;
+        ob_start();
+        ?>
+            <div class="power_controls">
+                <br />
+                <button id="btn_spin"><?=$btn?></button>
+            </div>
+        <?php
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
     public static function render_rulette($attrs)
     {
         if (!isset($attrs['pack'])) return;
         $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
+        $btn = isset($attrs['button']) ? $attrs['button'] : 'Lanzar';
         ob_start();
     ?>
         <table cellpadding="0" cellspacing="0" border="0">
             <tr>
-                <td>
-                    <div class="power_controls">
-                        <br />
-                        <button id="btn_spin">lanzar</button>
-                    </div>
-                </td>
                 <td width="438" height="582" class="the_wheel" style="text-align:center" valign="center">
                     <canvas id="canvas" width="434" height="434" data-pack="<?= $packname ?>">
                         <p style="color: white; text-align:center">Sorry, your browser doesn't support canvas. Please try another.</p>
                     </canvas>
                 </td>
             </tr>
+            <?php if($btn != ''): ?>
+            <tr>
+                <td>
+                    <div class="power_controls">
+                        <br />
+                        <button id="btn_spin"><?=$btn?></button>
+                    </div>
+                </td>
+            </tr>
+            <?php endif; ?>
         </table>
     <?php
         $html = ob_get_contents();
@@ -318,9 +398,6 @@ class WP_Rulette extends Plugink
         ob_start();
     ?>
         <div class="board-container">
-            <div class="board-content">
-                <h3>Board</h3>
-            </div>
             <div class="board-content">
                 <?php foreach ($sectores as $sector) {
                     if( !in_array( $sector['tag'], $exclude) ){
