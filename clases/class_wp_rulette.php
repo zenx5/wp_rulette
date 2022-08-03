@@ -26,9 +26,36 @@ class WP_Rulette extends Plugink
         add_action('rest_api_init', array('WP_Rulette', 'api_rulette'));
         add_action('wp_head', array('WP_Rulette', 'head'));
         add_action('gamepack_edit_form', array('WP_Rulette', 'difficulty_form'));
+        add_action('saved_gamepack', array('WP_Rulette', 'save_category'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
         add_shortcode('rulette_button', array('WP_Rulette', 'button'));
+    }
+
+    public static function save_category($term_id){
+        if( 'gamepack' == $_POST['taxonomy'] ){
+            // echo "<script>console.log(".json_encode($_POST).")</script>";
+            // echo "<br>";
+            // echo "Term ID: $term_id";        
+            try{
+                //echo json_encode( 
+                update_term_meta($term_id, 'difficulty', $_POST['difficulty']);
+            // );
+                //echo "Result: ".json_encode(wp_update_term($term_id, 'gamepack' ) );
+            }catch(Exception $err){
+                echo json_encode($err);
+            }
+
+            
+                // 'name' => $_POST['name'],
+                // 'description' => $_POST['description'], 
+                // 'slug' => $_POST['slug'],
+                //'difficulty' => $_POST['difficulty']
+            
+            
+
+        }
+        
     }
 
     public static function get_packs(){
@@ -48,21 +75,18 @@ class WP_Rulette extends Plugink
         return $packs;
     }
     
-    public static function difficulty_form(){
+    public static function difficulty_form($term){
+        $difficulty = get_term_meta( $term->term_id, 'difficulty')[0];
         ?>
-        <script>
-            console.log(<?=json_encode(self::get_level())?>)
-        </script>
         <table class="form-table">
             <tr class="form-field">
                 <th scope="row">Dificultad</th>
                 <td>
-                    <select>
-                        <option>Seleccione</option>
+                    <select id="difficulty" name="difficulty">
+                        <option <?=$difficulty=='-1'?'selected':''?> value="-1">Seleccione</option>
                         <?php foreach( self::get_level() as $level):?>
-                            <option value="<?=$level['ID']?>"><?=$level['label']?></option>
+                            <option <?=$difficulty==$level['ID']?'selected':''?> value="<?=$level['ID']?>"><?=$level['label']?></option>
                         <?php endforeach; ?>
-
                     </select>
                 </td>
             </tr>
