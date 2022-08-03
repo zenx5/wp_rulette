@@ -29,9 +29,7 @@ class WP_Rulette extends Plugink
         add_action('saved_gamepack', array('WP_Rulette', 'save_category'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
-<<<<<<< HEAD
         add_shortcode('rulette_user', array('WP_Rulette', 'users'));
-=======
         add_shortcode('rulette_button', array('WP_Rulette', 'button'));
     }
 
@@ -81,7 +79,6 @@ class WP_Rulette extends Plugink
             </tr>
         </table>
         <?php
->>>>>>> af965b3ba2eca8ed25fadb881d4112a3838c6c2e
     }
 
     public static function save_play_in_history( ) {
@@ -347,13 +344,18 @@ class WP_Rulette extends Plugink
                 <table>
                     <thead>
                         <tr>
-                            <th>Players</th>
-                            <th>Jugadas</th>
+                            <th>Nombre</th>
+                            <th>Saldo</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody id="user-body">
+                        
+                    </tbody>
                 </table>
-                <button class="btn-new-player" >Add new plyer</button>
+                <div>
+                    <input type="text" />
+                    <input type="number" />
+                </div>
             </div>
             <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
         <?php
