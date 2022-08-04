@@ -353,8 +353,7 @@ class WP_Rulette extends Plugink
                     </tbody>
                 </table>
                 <div>
-                    <input type="text" />
-                    <input type="number" />
+                    <button>Add new player</button>
                 </div>
             </div>
             <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
