@@ -24,7 +24,8 @@
         document.querySelector('.users-container tbody').appendChild(tr);
         document.querySelector('.users-container button').onclick = _ => {
 			let players = JSON.parse(sessionStorage.getItem('players') || '[]');
-			let id = players.sort( (A, B) => B.id - A.id )[0].id + 1;
+			players.sort( (A, B) => B.id - A.id );
+			id = players[0] ? players[0].id+1 : 1;
 			let player = {
 				id: id,
 				name: document.querySelector('.users-container tbody tr input.name').value,
