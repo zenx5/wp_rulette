@@ -29,6 +29,7 @@ class WP_Rulette extends Plugink
         add_action('saved_gamepack', array('WP_Rulette', 'save_category'));
         add_shortcode('rulette', array('WP_Rulette', 'render_rulette'));
         add_shortcode('rulette_board', array('WP_Rulette', 'board'));
+        add_shortcode('rulette_user', array('WP_Rulette', 'users'));
         add_shortcode('rulette_button', array('WP_Rulette', 'button'));
     }
 
@@ -331,6 +332,34 @@ class WP_Rulette extends Plugink
     <?php
         $html = ob_get_contents();
         ob_end_clean();
+        return $html;
+    }
+
+    public static function users($attrs){
+        if (!isset($attrs['pack'])) return;
+        $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
+        ob_start( );
+        ?>
+            <div class="users-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-body">
+                        
+                    </tbody>
+                </table>
+                <div>
+                    <button>Add new player</button>
+                </div>
+            </div>
+            <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
+        <?php
+        $html = ob_get_contents( );
+        ob_end_clean( );
         return $html;
     }
 
