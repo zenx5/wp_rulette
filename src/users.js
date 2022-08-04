@@ -1,6 +1,6 @@
 (function() {
     addEventListener('load', function() {
-		let players = JSON.parse(sessionStorage.getItem('players') || '[{"id":1,"name":"moises","plays":[],"money":500},{"id":2,"name":"mario","plays":[],"money":400}]');
+		let players = JSON.parse(sessionStorage.getItem('players') || '[]');
     	for( let player of players ) {
 			let template = ``
     		let tr = document.createElement('tr');
@@ -23,7 +23,7 @@
     	`
         document.querySelector('.users-container tbody').appendChild(tr);
         document.querySelector('.users-container button').onclick = _ => {
-			let players = JSON.parse(sessionStorage.getItem('players') || '[{"id":1,"name":"moises","plays":[],"money":500},{"id":2,"name":"mario","plays":[],"money":400}]');
+			let players = JSON.parse(sessionStorage.getItem('players') || '[]');
 			let id = players.sort( (A, B) => B.id - A.id )[0].id + 1;
 			let player = {
 				id: id,
@@ -39,7 +39,7 @@
     		let tr2 = document.createElement('tr');
     		tr2.dataset.player = player.id;
     		tr2.onclick = _ => {
-    			sessionStorage.setItem('currentUser', player.id );
+    			sessionStorage.setItem('current-user', player.id );
     		}
 			let template = `
 	                <td> ${player.name} </td>
