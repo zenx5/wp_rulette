@@ -31,8 +31,8 @@
 				name: document.querySelector('.users-container tbody tr input.name').value,
 				money: +document.querySelector('.users-container tbody tr input.money').value
 			}
-			console.log(!player.name , !player.money)
-			console.log(player)
+			document.querySelector('.users-container tbody tr input.name').value = '';
+			document.querySelector('.users-container tbody tr input.money').value = '';
 			if( !player.name || !player.money ) return;
 			players.push( player );
 			sessionStorage.setItem('players', JSON.stringify(players));
