@@ -342,19 +342,28 @@ class WP_Rulette extends Plugink
         ?>
             <style id="style-user"></style>
             <div class="users-container">
-                <table>
+                <table class="users-list">
                     <thead>
                         <tr>
                             <th>Nombre</th>
                             <th>Saldo</th>
+                            <th>Accion</th>
                         </tr>
                     </thead>
                     <tbody id="user-body">
                         
                     </tbody>
                 </table>
+                <table class="users-action">
+                    <tbody>
+                        <tr>
+                            <td><input type="text" class="name" style="width:100%;"/></td>
+                            <td><input type="number" class="money" style="width:100%;"/></td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div>
-                    <button>Add new player</button>
+                    <button id="add">Add new player</button>
                 </div>
             </div>
             <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/users.js"></script>
