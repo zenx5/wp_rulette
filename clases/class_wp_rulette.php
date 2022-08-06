@@ -340,6 +340,7 @@ class WP_Rulette extends Plugink
         $packname = isset($attrs['pack']) ? $attrs['pack'] : '';
         ob_start( );
         ?>
+            <style id="style-user"></style>
             <div class="users-container">
                 <table>
                     <thead>
