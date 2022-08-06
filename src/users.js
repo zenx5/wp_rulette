@@ -2,20 +2,20 @@
     addEventListener('load', function() {
 		let players = JSON.parse(sessionStorage.getItem('players') || '[]');
     	for( let player of players ) {
+			const index = players.findIndex(elem => (elem.id===player.id)) + 1
 			let template = ``
     		let tr = document.createElement('tr');
 			let tdname = document.createElement('td')
 			tdname.innerHTML = player.name
 			tdname.dataset.player = player.id;
 			tdname.addEventListener('click', ev => {
-				console.log('id',ev.target.dataset.player )
+				document.querySelector('#style-user').innerHTML = "#user-body tr:nth-child("+index+"){font-weight: bold;}"
     			sessionStorage.setItem('currentUser', ev.target.dataset.player );
     		})
 			tr.append(tdname)
 			let tdmoney = document.createElement('td')
-			tdmoney.innerHTML = player.name
-			tr.append(tdname)
-
+			tdmoney.innerHTML = player.money
+			tr.append(tdmoney)
         	document.querySelector('.users-container tbody').appendChild(tr);
         };
     	let tr = document.createElement('tr');
