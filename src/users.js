@@ -4,22 +4,25 @@
     	for( let player of players ) {
 			let template = ``
     		let tr = document.createElement('tr');
-    		tr.dataset.player = player.id;
-    		tr.onclick = _ => {
-    			sessionStorage.setItem('currentUser', player.id );
-    		}
-			template += `
-	                <td> ${player['name']} </td>
-	                <td> ${player.money} </td>
-            `
-	        tr.innerHTML = template;
+			let tdname = document.createElement('td')
+			tdname.innerHTML = player.name
+			tdname.dataset.player = player.id;
+			tdname.addEventListener('click', ev => {
+				console.log('id',ev.target.dataset.player )
+    			sessionStorage.setItem('currentUser', ev.target.dataset.player );
+    		})
+			tr.append(tdname)
+			let tdmoney = document.createElement('td')
+			tdmoney.innerHTML = player.name
+			tr.append(tdname)
+
         	document.querySelector('.users-container tbody').appendChild(tr);
         };
     	let tr = document.createElement('tr');
     	tr.dataset.player = -1;
     	tr.innerHTML = `
-            <td> <input type="text" class="name" > </td>
-            <td> <input type="number" class="money" > </td>
+            <td> <input type="text" class="name" style="width:100%;"></td>
+            <td> <input type="number" class="money" style="width:100%;"></td>
     	`
         document.querySelector('.users-container tbody').appendChild(tr);
         document.querySelector('.users-container button').onclick = _ => {
