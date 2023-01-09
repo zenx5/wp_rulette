@@ -1,3 +1,4 @@
+//"use strict"
 (function () {
     const currentUser = parseInt(sessionStorage.getItem("currentUser")) || null;
     const plays = JSON.parse(sessionStorage.getItem("plays")) || []
