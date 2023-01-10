@@ -238,45 +238,7 @@ class WP_Rulette extends Plugink
     public static function head()
     {
 ?>
-        <style>
-            .board-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center
-            }
-
-            .board-content {
-                display: flex;
-                width: 100%;
-                align-items: center;
-                justify-content: center;
-                flex-direction: column;
-            }
-
-            .board-row {
-                display: flex;
-                flex-direction: row;
-                width: 100%;
-                justify-content: space-around;
-            }
-
-            .board-tag {
-                border: 2px solid white;
-                text-align: center;
-                font-weight: bold;
-                color: white;
-                cursor: pointer;
-                opacity: 0.6;
-                padding: 10px;
-            }
-
-            .board-tag.selected {
-                opacity: 1;
-                border: 4px solid #00f;
-                padding: 8px;
-            }
-        </style>
-        <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" />
+        <link href="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/main.css" rel="stylesheet" />
         <script type="text/javascript" src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/Winwheel.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/TweenMax.min.js"></script>
         <script src="<?= WP_CONTENT_URL ?>/plugins/wp_rulette/src/ruleta.js"></script>

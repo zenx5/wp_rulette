@@ -6,10 +6,13 @@
 		const index = players.findIndex(elem => (elem.id===player.id)) + 1
 		const tr = document.createElement('tr');
 		const tdname = document.createElement('td')
-		tdname.innerHTML = player.name
+		tdname.innerHTML = `<p><span class="selected">*</span><span>${player.name}</span></p>`
 		tdname.dataset.player = player.id;
 		tdname.addEventListener('click', ev => {
-			document.querySelector('#style-user').innerHTML = "#user-body tr:nth-child("+index+"){font-weight: bold;}"
+			document.querySelectorAll("#user-body tr").forEach( element => {
+				element.setAttribute("class", "")
+			})
+			tdname.parentElement.setAttribute("class", "user-selected")
 			sessionStorage.setItem('currentUser', index );
 			document.querySelectorAll(".board-tag").forEach( elem => {
 				elem.setAttribute("class", "board-tag")
@@ -41,12 +44,14 @@
 	}
 
     addEventListener('load', function() {
-		if( currentUser ){
-			document.querySelector('#style-user').innerHTML = "#user-body tr:nth-child("+currentUser+"){font-weight: bold;}"
-		}
     	for( let player of players ) {
 			createRow(player)
-        }    	
+        }
+		if( currentUser ){
+			document.querySelectorAll("#user-body tr").forEach( (element, index) => {
+				if( index === currentUser - 1 ) element.setAttribute("class", "user-selected")
+			})
+		}
 		        
 		document
 			.querySelector('.users-container #add')
